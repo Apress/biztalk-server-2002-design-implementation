@@ -1,0 +1,3 @@
+COMPANY:John Wayne Inc.
+Job:OpenAccount,,|InvestorInfo:bergman,Ingrid,bingrid@casabanca,123-456-789,1500,1234567892
+Job:Trade,,|InvestorInfo:Peck,Grogery,pgrogery@spellbound.com,123-456-788,20000,1234567893|MutualFunds:MutualFund:Fonda International Growth,Buy,300,45.00+MutualFund:Fonda Fix Income	Sell,300,15

@@ -1,0 +1,201 @@
+<?xml version="1.0"?>
+<!--
+    File created by XLANG Scheduler Engine version 1.0
+    at Sun Sep 08 19:40:33 2002
+
+    '===========================
+    ' Starting the XLANG schedule
+    Set oSked = GetObject("sked://localhost/C:\Apress-PostEdit\SourceCode\Chapter10\QuoteService.skx")
+    sName = oSked.FullyQualifiedName
+
+    '===========================
+    ' Getting proxy for COM port
+    ' Set oPort = oSked.Port("yourPortNameBoundToCOM")
+    ' Call oPort.yourMethod(args ...)
+ 
+
+    '===========================
+    ' Get full queue name (MSMQ port)
+    ' or moniker (COM port)
+    ' sName = oSked.FullPortName("yourPortName")
+-->
+<module xmlns="urn:schemas-microsoft-com:scheduler" xmlns:com="urn:schemas-microsoft-com:comscheduler" xmlns:msmq="urn:schemas-microsoft-com:msmqscheduler">
+	<module name="QuoteService" identity="55C7466C-0883-4BE8-9646-EBD88A4A85B0">
+		<schedule>
+			<header>
+				<portList>
+					<port tag="0!15" name="QuoteServicePort"/>
+				</portList>
+				<messageList>
+					<message tag="4!3" name="Constants"/>
+					<message tag="4!17" name="ReceiveTicker_in"/>
+					<message tag="4!17" name="ReceiveTicker_out"/>
+					<message tag="4!40" name="RetrieveQuotes_in"/>
+					<message tag="4!40" name="RetrieveQuotes_out"/>
+				</messageList>
+				<ruleList/>
+				<contextParameterList/>
+			</header>
+			<sequence tag="0!6">
+				<block>
+					<synchronous tag="0!5" comment="ReceiveTickers">
+						<sink tag="0!5" comment="ReceiveTickers">
+							<portRef location="QuoteServicePort"/>
+							<messageRef location="ReceiveTicker_in"/>
+						</sink>
+						<source tag="0!5" comment="ReceiveTickers">
+							<portRef location="QuoteServicePort"/>
+							<messageRef location="ReceiveTicker_out"/>
+						</source>
+					</synchronous>
+					<synchronous tag="0!6" comment="RetrieveQuotes">
+						<sink tag="0!6" comment="RetrieveQuotes">
+							<portRef location="QuoteServicePort"/>
+							<messageRef location="RetrieveQuotes_in"/>
+						</sink>
+						<source tag="0!6" comment="RetrieveQuotes">
+							<portRef location="QuoteServicePort"/>
+							<messageRef location="RetrieveQuotes_out"/>
+						</source>
+					</synchronous>
+				</block>
+				<zero tag="0!7"/>
+			</sequence>
+		</schedule>
+		<binding>
+			<moduleRef location="ancestor::*[local-name()='module' and *[local-name()='schedule']]"/>
+			<translationHeaderList>
+				<translationHeader>
+					<com:header txnsupport="DISABLED"/>
+				</translationHeader>
+				<translationHeader>
+					<msmq:header/>
+				</translationHeader>
+			</translationHeaderList>
+			<schemaList>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Constants">
+					<ElementType name="ElementType_Constants">
+						<element type="__Instance_Id__"/>
+					</ElementType>
+					<ElementType name="__Instance_Id__" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_ReceiveTicker_in">
+					<ElementType name="ElementType_ReceiveTicker_in">
+						<element type="doc"/>
+					</ElementType>
+					<ElementType name="doc" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_ReceiveTicker_out">
+					<ElementType name="ElementType_ReceiveTicker_out">
+						<element type="doc"/>
+						<element type="ReceiveTicker"/>
+					</ElementType>
+					<ElementType name="doc" dt:type="string"/>
+					<ElementType name="ReceiveTicker" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_RetrieveQuotes_in">
+					<ElementType name="ElementType_RetrieveQuotes_in"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_RetrieveQuotes_out">
+					<ElementType name="ElementType_RetrieveQuotes_out">
+						<element type="RetrieveQuotes"/>
+					</ElementType>
+					<ElementType name="RetrieveQuotes" dt:type="string"/>
+				</Schema>
+			</schemaList>
+			<messageDeclList>
+				<messageDecl>
+					<messageRef location="Constants"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Constants']/*[local-name()='ElementType' and @name='ElementType_Constants']"/>
+					<ElementType_Constants xmlns="x-schema:#Schema_Constants" xmlns:sched="urn:schemas-microsoft-com:scheduler">
+						<__Instance_Id__ sched:tag="4!9">__Instance_Id__</__Instance_Id__>
+					</ElementType_Constants>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="ReceiveTicker_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_ReceiveTicker_in']/*[local-name()='ElementType' and @name='ElementType_ReceiveTicker_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="ReceiveTicker_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_ReceiveTicker_out']/*[local-name()='ElementType' and @name='ElementType_ReceiveTicker_out']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="RetrieveQuotes_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_RetrieveQuotes_in']/*[local-name()='ElementType' and @name='ElementType_RetrieveQuotes_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="RetrieveQuotes_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_RetrieveQuotes_out']/*[local-name()='ElementType' and @name='ElementType_RetrieveQuotes_out']"/>
+				</messageDecl>
+			</messageDeclList>
+			<portBindingList>
+				<portBinding tag="0!15">
+					<portRef location="QuoteServicePort"/>
+					<portTranslation>
+						<com:interface tag="0!11" iid="d9adefdd-fc41-4ece-bbe2-10f1a5100262" clsid="20a54199-ea3d-42ae-8096-caf153d97cf7"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!19">
+							<messageRef location="ReceiveTicker_in"/>
+							<messageTranslation>
+								<com:method tag="0!18" name="ReceiveTicker" slot="8" dispid="1610809347" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!24">
+									<fieldRef location="doc"/>
+									<fieldTranslation>
+										<com:parameter tag="4!24" name="doc" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding tag="0!20">
+							<messageRef location="ReceiveTicker_out"/>
+							<messageTranslation>
+								<com:return tag="0!18" name="ReceiveTicker" slot="8" dispid="1610809347" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!32">
+									<fieldRef location="doc"/>
+									<fieldTranslation>
+										<com:parameter tag="4!32" name="doc" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!36">
+									<fieldRef location="ReceiveTicker"/>
+									<fieldTranslation>
+										<com:parameter tag="4!36" name="ReceiveTicker" index="1" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding tag="0!22">
+							<messageRef location="RetrieveQuotes_in"/>
+							<messageTranslation>
+								<com:method tag="0!17" name="RetrieveQuotes" slot="7" dispid="1610809346" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList/>
+						</messageBinding>
+						<messageBinding tag="0!23">
+							<messageRef location="RetrieveQuotes_out"/>
+							<messageTranslation>
+								<com:return tag="0!17" name="RetrieveQuotes" slot="7" dispid="1610809346" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!51">
+									<fieldRef location="RetrieveQuotes"/>
+									<fieldTranslation>
+										<com:parameter tag="4!51" name="RetrieveQuotes" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+			</portBindingList>
+			<contextBindingList/>
+			<ruleBindingList/>
+			<callBindingList/>
+		</binding>
+	</module>
+</module>

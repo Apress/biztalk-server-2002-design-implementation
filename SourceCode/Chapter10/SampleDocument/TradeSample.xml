@@ -1,0 +1,23 @@
+<Trade>
+	<FundCompany>Henry Fonda Inc.</FundCompany>
+	<ReplyTo/>
+	<TradeItems>
+		<TradeItem>
+			<Ticker>IBM</Ticker>
+			<TransactionType>Buy</TransactionType>
+			<Share>10000</Share>
+			<Price/>
+			<OrderType>Market Order</OrderType>
+			<ExecutionStatus/>
+		</TradeItem>
+		<TradeItem>
+			<Ticker>MSFT</Ticker>
+			<TransactionType>Buy</TransactionType>
+			<Share>15000</Share>
+			<Price>65.50</Price>
+			<OrderType>Limit Order</OrderType>
+			<ExecutionStatus/>
+		</TradeItem>
+	</TradeItems>
+	<TotalTransactionAmount/>
+</Trade>

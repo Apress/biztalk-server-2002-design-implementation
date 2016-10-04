@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+ <!-- Generated 01/22/02 by Microsoft SOAP Toolkit WSDL File Generator, Version 1.02.812.0 --> 
+<definitions  name ='QuoteService'   targetNamespace = 'http://tempuri.org/wsdl/'
+	 xmlns:wsdlns='http://tempuri.org/wsdl/' 
+	 xmlns:typens='http://tempuri.org/type' 
+	 xmlns:soap='http://schemas.xmlsoap.org/wsdl/soap/' 
+	 xmlns:xsd='http://www.w3.org/2001/XMLSchema' 
+	 xmlns:stk='http://schemas.microsoft.com/soap-toolkit/wsdl-extension'
+	 xmlns='http://schemas.xmlsoap.org/wsdl/'> 
+  <types>
+    <schema targetNamespace='http://tempuri.org/type'
+      xmlns='http://www.w3.org/2001/XMLSchema'
+      xmlns:SOAP-ENC='http://schemas.xmlsoap.org/soap/encoding/'
+      xmlns:wsdl='http://schemas.xmlsoap.org/wsdl/'
+      elementFormDefault='qualified'>
+    </schema>
+  </types>
+  <message name='QuoteService.QuoteServiceController'>
+    <part name='Tickers' type='xsd:string'/>
+  </message>
+  <message name='QuoteService.QuoteServiceControllerResponse'>
+    <part name='Result' type='xsd:string'/>
+    <part name='Tickers' type='xsd:string'/>
+  </message>
+  <portType name='QuoteServiceSoapPort'>
+    <operation name='QuoteServiceController' parameterOrder='Tickers'>
+      <input message='wsdlns:QuoteService.QuoteServiceController' />
+      <output message='wsdlns:QuoteService.QuoteServiceControllerResponse' />
+    </operation>
+  </portType>
+  <binding name='QuoteServiceSoapBinding' type='wsdlns:QuoteServiceSoapPort' >
+    <stk:binding preferredEncoding='UTF-8'/>
+    <soap:binding style='rpc' transport='http://schemas.xmlsoap.org/soap/http' />
+    <operation name='QuoteServiceController' >
+      <soap:operation soapAction='http://tempuri.org/action/QuoteService.QuoteServiceController' />
+      <input>
+        <soap:body use='encoded' namespace='http://tempuri.org/message/'
+		  encodingStyle='http://schemas.xmlsoap.org/soap/encoding/' />
+      </input>
+      <output>
+        <soap:body use='encoded' namespace='http://tempuri.org/message/'
+		  encodingStyle='http://schemas.xmlsoap.org/soap/encoding/' />
+      </output>
+    </operation>
+  </binding>
+  <service name='QuoteService' >
+    <port name='QuoteServiceSoapPort' binding='wsdlns:QuoteServiceSoapBinding' >
+      <soap:address location='http://w2kserver/QuoteService/QuoteService.ASP' />
+    </port>
+  </service>
+</definitions>

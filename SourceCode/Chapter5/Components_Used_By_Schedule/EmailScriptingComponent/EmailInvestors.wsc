@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<component>
+
+<?component error="true" debug="true"?>
+
+<registration
+	description="EmailInvestors"
+	progid="EmailInvestors.WSC"
+	version="1.00"
+	classid="{f8b49db5-07ad-47af-a847-cab5746f98e0}"
+>
+</registration>
+
+<public>
+	<method name="Send">
+		<PARAMETER name="document"/>
+	</method>
+</public>
+
+<script language="VBScript">
+<![CDATA[
+
+function Send(document)
+	Send = "Temporary Value"
+end function
+
+]]>
+</script>
+
+</component>

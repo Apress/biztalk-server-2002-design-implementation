@@ -1,0 +1,40 @@
+<FundInvestors>
+	<FundCompany>Henry Fonda Inc.</FundCompany>
+	<Investors>
+		<Investor>
+			<InvestorName >Frenando Rey</InvestorName >
+			<Action>OpenAccount</Action>
+			<InvestorInfo>
+				<email>frey@frenchconnection.com</email>
+				<phone>212-555-1515</phone>
+				<ssn>111111111</ssn>
+				<balance>5000</balance>
+			</InvestorInfo>
+			<Status description="">OK</Status>
+
+		</Investor>
+		<Investor>
+			<InvestorName >Toshiro Mifune</InvestorName >
+			<Action>OpenAccount</Action>
+			<InvestorInfo>
+				<email>tmifune@highandlow.com</email>
+				<phone>212-555-1516</phone>
+				<ssn>222222222</ssn>
+				<balance>6000</balance>
+			</InvestorInfo>
+
+		</Investor>		
+		<Investor>
+			<InvestorName>Gene Hackman</InvestorName >
+			<Action>Trade</Action>
+			<Funds>
+<Fund name="Fonda International Income Fund" transaction="buy" quantity="100" price="15.6"/>
+
+<Fund name="Fonda International Growth Fund" transaction="buy" quantity="100" price="26"/>
+
+<Fund name="Fonda US Treasury Fund" transaction="sell" quantity="200" price="12"/>
+			</Funds>
+			<Status description=""/>
+		</Investor>		
+	</Investors>
+</FundInvestors>

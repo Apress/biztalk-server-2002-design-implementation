@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8' ?> 
+ <!-- Generated 01/22/02 by Microsoft SOAP Toolkit WSDL File Generator, Version 1.02.812.0 --> 
+<servicemapping name='QuoteService'>
+  <service name='QuoteService'>
+    <using PROGID='StockExchangeQuotes.QuoteService' cachable='0' ID='QuoteServiceObject' />
+    <port name='QuoteServiceSoapPort'>
+      <operation name='QuoteServiceController'>
+        <execute uses='QuoteServiceObject' method='QuoteServiceController' dispID='1610809348'>
+          <parameter callIndex='1' name='Tickers' elementName='Tickers' />
+          <parameter callIndex='-1' name='retval' elementName='Result' />
+        </execute>
+      </operation>
+    </port>
+  </service>
+</servicemapping>
+ 

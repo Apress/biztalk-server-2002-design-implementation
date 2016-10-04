@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BTMSeedPackage SeedID="{B7743423-8FA1-40D9-9419-EDCEB185B2A8}"><Server>W2KSERVER2</Server><Operation>61471</Operation><Status>1</Status><Organization Name="Bob Mutual Fund ASP"/><Document Direction="0" Operation="61471" Status="1"><ProductionUrl>http://W2KSERVER/B2B_Anonymous/FundInvestorsPost.asp</ProductionUrl><TestUrl>http://W2KSERVER/B2B_Anonymous/slingback.asp</TestUrl><Specification Name="FundInvestors.xml"><Schema name="FundInvestors" b:BizTalkServerEditorTool_Version="1.5" b:root_reference="FundInvestors" b:standard="XML" xmlns="urn:schemas-microsoft-com:xml-data" xmlns:b="urn:schemas-microsoft-com:BizTalkServer" xmlns:d="urn:schemas-microsoft-com:datatypes">
+				<b:SelectionFields><b:Field key="Src_ID_Value" query="*[local-name()='FundCompany' and namespace-uri()='']"/></b:SelectionFields>
+				<ElementType name="ssn" content="textOnly" model="closed" d:type="string">
+					<b:FieldInfo/>
+				</ElementType><ElementType name="phone" content="textOnly" model="closed" d:type="string">
+					<b:FieldInfo/>
+				</ElementType><ElementType name="email" content="textOnly" model="closed" d:type="string">
+					<b:FieldInfo/>
+				</ElementType><ElementType name="balance" content="textOnly" model="closed" d:type="number">
+					<b:FieldInfo/>
+				</ElementType><ElementType name="Status" content="textOnly" model="open">
+					<b:RecordInfo/>
+					<AttributeType name="description" d:type="string">
+						<b:FieldInfo/></AttributeType>
+					<attribute type="description" required="no"/>
+				</ElementType><ElementType name="Investors" content="eltOnly" model="closed">
+					<b:RecordInfo/>
+					<element type="Investor" maxOccurs="*" minOccurs="1"/>
+				</ElementType><ElementType name="InvestorName" content="textOnly" model="closed" d:type="string">
+					<b:FieldInfo/>
+				</ElementType><ElementType name="InvestorInfo" content="eltOnly" model="closed">
+					<b:RecordInfo/>
+					<element type="email" maxOccurs="1" minOccurs="1"/>
+					<element type="phone" maxOccurs="1" minOccurs="1"/>
+					<element type="ssn" maxOccurs="1" minOccurs="1"/>
+					<element type="balance" maxOccurs="1" minOccurs="1"/>
+				</ElementType><ElementType name="Investor" content="eltOnly" order="seq" model="closed">
+					<b:RecordInfo/>
+					<element type="InvestorName" maxOccurs="1" minOccurs="1"/>
+					<element type="Action" maxOccurs="1" minOccurs="1"/>
+					<element type="InvestorInfo" maxOccurs="1" minOccurs="0"/>
+					<element type="Funds" maxOccurs="1" minOccurs="0"/>
+					<element type="Status" maxOccurs="1" minOccurs="0"/>
+				</ElementType><ElementType name="Funds" content="eltOnly" model="closed">
+					<b:RecordInfo/>
+					<element type="Fund" maxOccurs="*" minOccurs="0"/>
+				</ElementType><ElementType name="FundInvestors" content="eltOnly" model="closed">
+					<b:RecordInfo/>
+					<element type="FundCompany" maxOccurs="1" minOccurs="1"/>
+					<element type="Investors" maxOccurs="1" minOccurs="1"/>
+				</ElementType><ElementType name="FundCompany" content="textOnly" model="closed" d:type="string">
+					<b:FieldInfo/>
+				</ElementType><ElementType name="Fund" content="textOnly" model="closed">
+					<b:RecordInfo/>
+					<AttributeType name="transaction" d:type="string">
+						<b:FieldInfo/></AttributeType>
+					<AttributeType name="quantity" d:type="number">
+						<b:FieldInfo/></AttributeType>
+					<AttributeType name="price" d:type="number">
+						<b:FieldInfo/></AttributeType>
+					<AttributeType name="name" d:type="string">
+						<b:FieldInfo/></AttributeType>
+					<attribute type="name" required="no"/>
+					<attribute type="transaction" required="no"/>
+					<attribute type="quantity" required="no"/>
+					<attribute type="price" required="no"/>
+				</ElementType><ElementType name="Action" content="textOnly" model="closed" d:type="enumeration" d:values="OpenAccount CloseAccount Trade">
+					<b:FieldInfo/>
+				</ElementType></Schema></Specification><Instance Name="FundInvestorsSample.xml"><FundInvestors>
+				<FundCompany>Henry Fonda Inc.</FundCompany>
+				<Investors>
+					<Investor>
+						<InvestorName>Frenando Rey</InvestorName>
+						<Action>OpenAccount</Action>
+						<InvestorInfo>
+							<email>frey@frenchconnection.com</email>
+							<phone>212-555-1515</phone>
+							<ssn>111111111</ssn>
+							<balance>5000</balance>
+						</InvestorInfo>
+						<Status description="">OK</Status>
+					</Investor>
+					<Investor>
+						<InvestorName>Toshiro Mifune</InvestorName>
+						<Action>OpenAccount</Action>
+						<InvestorInfo>
+							<email>tmifune@highandlow.com</email>
+							<phone>212-555-1516</phone>
+							<ssn>222222222</ssn>
+							<balance>6000</balance>
+						</InvestorInfo>
+					</Investor>
+					<Investor>
+						<InvestorName>Gene Hackman</InvestorName>
+						<Action>Trade</Action>
+						<Funds>
+							<Fund name="Fonda International Income Fund" transaction="buy" quantity="100" price="15.6"/>
+							<Fund name="Fonda International Growth Fund" transaction="buy" quantity="100" price="26"/>
+							<Fund name="Fonda US Treasury Fund" transaction="sell" quantity="200" price="12"/>
+						</Funds>
+						<Status description=""/>
+					</Investor>
+				</Investors>
+			</FundInvestors></Instance><ReceiveLocation>c:\test_inbound</ReceiveLocation><ReceiveMask>*.xml</ReceiveMask><Test_DropLocation>c:\test_drop</Test_DropLocation></Document><Document Direction="1" Operation="61471" Status="1"><ProductionUrl>http://W2kSERVER2/B2B/Anonymous/localsubmit.asp</ProductionUrl><TestUrl>http://W2KSERVER/B2B_Anonymous/trigger.asp</TestUrl><Specification Name="FundInvestors_response.xml"><Schema name="FundInvestors" b:BizTalkServerEditorTool_Version="1.5" b:root_reference="FundInvestors" b:standard="XML" xmlns="urn:schemas-microsoft-com:xml-data" xmlns:b="urn:schemas-microsoft-com:BizTalkServer" xmlns:d="urn:schemas-microsoft-com:datatypes">
+				<b:SelectionFields><b:Field key="Src_ID_Value" query="*[local-name()='FundCompany' and namespace-uri()='']"/></b:SelectionFields>
+				<ElementType name="ssn" content="textOnly" model="closed" d:type="string">
+					<b:FieldInfo/>
+				</ElementType><ElementType name="phone" content="textOnly" model="closed" d:type="string">
+					<b:FieldInfo/>
+				</ElementType><ElementType name="email" content="textOnly" model="closed" d:type="string">
+					<b:FieldInfo/>
+				</ElementType><ElementType name="balance" content="textOnly" model="closed" d:type="number">
+					<b:FieldInfo/>
+				</ElementType><ElementType name="Status" content="textOnly" model="open">
+					<b:RecordInfo/>
+					<AttributeType name="description" d:type="string">
+						<b:FieldInfo/></AttributeType>
+					<attribute type="description" required="no"/>
+				</ElementType><ElementType name="Investors" content="eltOnly" model="closed">
+					<b:RecordInfo/>
+					<element type="Investor" maxOccurs="*" minOccurs="1"/>
+				</ElementType><ElementType name="InvestorName" content="textOnly" model="closed" d:type="string">
+					<b:FieldInfo/>
+				</ElementType><ElementType name="InvestorInfo" content="eltOnly" model="closed">
+					<b:RecordInfo/>
+					<element type="email" maxOccurs="1" minOccurs="1"/>
+					<element type="phone" maxOccurs="1" minOccurs="1"/>
+					<element type="ssn" maxOccurs="1" minOccurs="1"/>
+					<element type="balance" maxOccurs="1" minOccurs="1"/>
+				</ElementType><ElementType name="Investor" content="eltOnly" order="seq" model="closed">
+					<b:RecordInfo/>
+					<element type="InvestorName" maxOccurs="1" minOccurs="1"/>
+					<element type="Action" maxOccurs="1" minOccurs="1"/>
+					<element type="InvestorInfo" maxOccurs="1" minOccurs="0"/>
+					<element type="Funds" maxOccurs="1" minOccurs="0"/>
+					<element type="Status" maxOccurs="1" minOccurs="0"/>
+				</ElementType><ElementType name="Funds" content="eltOnly" model="closed">
+					<b:RecordInfo/>
+					<element type="Fund" maxOccurs="*" minOccurs="0"/>
+				</ElementType><ElementType name="FundInvestors" content="eltOnly" model="closed">
+					<b:RecordInfo/>
+					<element type="FundCompany" maxOccurs="1" minOccurs="1"/>
+					<element type="Investors" maxOccurs="1" minOccurs="1"/>
+				</ElementType><ElementType name="FundCompany" content="textOnly" model="closed" d:type="string">
+					<b:FieldInfo/>
+				</ElementType><ElementType name="Fund" content="textOnly" model="closed">
+					<b:RecordInfo/>
+					<AttributeType name="transaction" d:type="string">
+						<b:FieldInfo/></AttributeType>
+					<AttributeType name="quantity" d:type="number">
+						<b:FieldInfo/></AttributeType>
+					<AttributeType name="price" d:type="number">
+						<b:FieldInfo/></AttributeType>
+					<AttributeType name="name" d:type="string">
+						<b:FieldInfo/></AttributeType>
+					<attribute type="name" required="no"/>
+					<attribute type="transaction" required="no"/>
+					<attribute type="quantity" required="no"/>
+					<attribute type="price" required="no"/>
+				</ElementType><ElementType name="Action" content="textOnly" model="closed" d:type="enumeration" d:values="OpenAccount CloseAccount Trade">
+					<b:FieldInfo/>
+				</ElementType></Schema></Specification><Instance Name="FundInvestorsResponseSample.xml"><FundInvestors>
+				<FundCompany>Henry Fonda Inc.</FundCompany>
+				<Investors>
+					<Investor>
+						<InvestorName>Frenando Rey</InvestorName>
+						<Action>OpenAccount</Action>
+						<InvestorInfo>
+							<email>frey@frenchconnection.com</email>
+							<phone>212-555-1515</phone>
+							<ssn>111111111</ssn>
+							<balance>5000</balance>
+						</InvestorInfo>
+						<Status description="">OK</Status>
+					</Investor>
+					<Investor>
+						<InvestorName>Toshiro Mifune</InvestorName>
+						<Action>OpenAccount</Action>
+						<InvestorInfo>
+							<email>tmifune@highandlow.com</email>
+							<phone>212-555-1516</phone>
+							<ssn>222222222</ssn>
+							<balance>6000</balance>
+						</InvestorInfo>
+					</Investor>
+					<Investor>
+						<InvestorName>Gene Hackman</InvestorName>
+						<Action>Trade</Action>
+						<Funds>
+							<Fund name="Fonda International Income Fund" transaction="buy" quantity="100" price="15.6"/>
+							<Fund name="Fonda International Growth Fund" transaction="buy" quantity="100" price="26"/>
+							<Fund name="Fonda US Treasury Fund" transaction="sell" quantity="200" price="12"/>
+						</Funds>
+						<Status description=""/>
+					</Investor>
+				</Investors>
+			</FundInvestors></Instance><ReceiveLocation></ReceiveLocation><ReceiveMask>*.xml</ReceiveMask><Test_DropLocation>C:\Seed_Drop</Test_DropLocation></Document></BTMSeedPackage>

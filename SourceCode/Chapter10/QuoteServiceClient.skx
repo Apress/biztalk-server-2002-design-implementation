@@ -1,0 +1,282 @@
+<?xml version="1.0"?>
+<!--
+    File created by XLANG Scheduler Engine version 1.0
+    at Sun Sep 08 19:57:26 2002
+
+    '===========================
+    ' Starting the XLANG schedule
+    Set oSked = GetObject("sked://localhost/C:\Apress-PostEdit\SourceCode\Chapter10\QuoteServiceClient.skx")
+    sName = oSked.FullyQualifiedName
+
+    '===========================
+    ' Getting proxy for COM port
+    ' Set oPort = oSked.Port("yourPortNameBoundToCOM")
+    ' Call oPort.yourMethod(args ...)
+ 
+
+    '===========================
+    ' Get full queue name (MSMQ port)
+    ' or moniker (COM port)
+    ' sName = oSked.FullPortName("yourPortName")
+-->
+<module xmlns="urn:schemas-microsoft-com:scheduler" xmlns:com="urn:schemas-microsoft-com:comscheduler" xmlns:msmq="urn:schemas-microsoft-com:msmqscheduler">
+	<module name="QuoteServiceClient" identity="C4AAD9E4-5BBA-43E4-9A25-8A67F2E95DD7">
+		<schedule>
+			<header>
+				<portList>
+					<port tag="0!18" name="ReceiveDoc"/>
+					<port tag="0!28" name="MakeSoapCall"/>
+					<port tag="0!36" name="ShowQuote"/>
+				</portList>
+				<messageList>
+					<message tag="4!3" name="Constants"/>
+					<message tag="4!17" name="TickerSymbol"/>
+					<message tag="4!84" name="QuoteServiceSoapClient_in"/>
+					<message tag="4!84" name="QuoteServiceSoapClient_out"/>
+					<message tag="4!59" name="SendApproval_in"/>
+					<message tag="4!59" name="SendApproval_out"/>
+				</messageList>
+				<ruleList/>
+				<contextParameterList/>
+			</header>
+			<sequence tag="0!7">
+				<block>
+					<sink tag="0!5" comment="Receive">
+						<portRef location="ReceiveDoc"/>
+						<messageRef location="TickerSymbol"/>
+					</sink>
+					<synchronous tag="0!6" comment="RequestStockQuote">
+						<source tag="0!6" comment="RequestStockQuote">
+							<portRef location="MakeSoapCall"/>
+							<messageRef location="QuoteServiceSoapClient_in"/>
+						</source>
+						<sink tag="0!6" comment="RequestStockQuote">
+							<portRef location="MakeSoapCall"/>
+							<messageRef location="QuoteServiceSoapClient_out"/>
+						</sink>
+					</synchronous>
+					<synchronous tag="0!7" comment="ShowQuote">
+						<source tag="0!7" comment="ShowQuote">
+							<portRef location="ShowQuote"/>
+							<messageRef location="SendApproval_in"/>
+						</source>
+						<sink tag="0!7" comment="ShowQuote">
+							<portRef location="ShowQuote"/>
+							<messageRef location="SendApproval_out"/>
+						</sink>
+					</synchronous>
+				</block>
+				<zero tag="0!8"/>
+			</sequence>
+		</schedule>
+		<binding>
+			<moduleRef location="ancestor::*[local-name()='module' and *[local-name()='schedule']]"/>
+			<translationHeaderList>
+				<translationHeader>
+					<com:header txnsupport="DISABLED"/>
+				</translationHeader>
+				<translationHeader>
+					<msmq:header/>
+				</translationHeader>
+			</translationHeaderList>
+			<schemaList>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Constants">
+					<ElementType name="ElementType_Constants">
+						<element type="__Instance_Id__"/>
+					</ElementType>
+					<ElementType name="__Instance_Id__" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_TickerSymbol">
+					<ElementType name="ElementType_TickerSymbol">
+						<element type="Document"/>
+					</ElementType>
+					<ElementType name="Document" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_QuoteServiceSoapClient_in">
+					<ElementType name="ElementType_QuoteServiceSoapClient_in">
+						<element type="document"/>
+					</ElementType>
+					<ElementType name="document" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_QuoteServiceSoapClient_out">
+					<ElementType name="ElementType_QuoteServiceSoapClient_out">
+						<element type="document"/>
+						<element type="QuoteServiceSoapClient"/>
+					</ElementType>
+					<ElementType name="document" dt:type="string"/>
+					<ElementType name="QuoteServiceSoapClient">
+						<element type="com:variant"/>
+					</ElementType>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_SendApproval_in">
+					<ElementType name="ElementType_SendApproval_in">
+						<element type="Document"/>
+					</ElementType>
+					<ElementType name="Document">
+						<element type="com:variant"/>
+					</ElementType>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_SendApproval_out">
+					<ElementType name="ElementType_SendApproval_out">
+						<element type="Document"/>
+						<element type="SendApproval"/>
+					</ElementType>
+					<ElementType name="Document">
+						<element type="com:variant"/>
+					</ElementType>
+					<ElementType name="SendApproval">
+						<element type="com:variant"/>
+					</ElementType>
+				</Schema>
+			</schemaList>
+			<messageDeclList>
+				<messageDecl>
+					<messageRef location="Constants"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Constants']/*[local-name()='ElementType' and @name='ElementType_Constants']"/>
+					<ElementType_Constants xmlns="x-schema:#Schema_Constants" xmlns:sched="urn:schemas-microsoft-com:scheduler">
+						<__Instance_Id__ sched:tag="4!9">__Instance_Id__</__Instance_Id__>
+					</ElementType_Constants>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="TickerSymbol"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_TickerSymbol']/*[local-name()='ElementType' and @name='ElementType_TickerSymbol']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="QuoteServiceSoapClient_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_QuoteServiceSoapClient_in']/*[local-name()='ElementType' and @name='ElementType_QuoteServiceSoapClient_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="QuoteServiceSoapClient_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_QuoteServiceSoapClient_out']/*[local-name()='ElementType' and @name='ElementType_QuoteServiceSoapClient_out']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="SendApproval_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_SendApproval_in']/*[local-name()='ElementType' and @name='ElementType_SendApproval_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="SendApproval_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_SendApproval_out']/*[local-name()='ElementType' and @name='ElementType_SendApproval_out']"/>
+				</messageDecl>
+			</messageDeclList>
+			<portBindingList>
+				<portBinding tag="0!18">
+					<portRef location="ReceiveDoc"/>
+					<portTranslation>
+						<msmq:queue tag="0!13" queueName="bts://&amp;Port_1&amp;.\private$\Port_1" wellKnown="0" queueInfoClsid="27f4275d-707c-4047-a77b-56a5d0eb034f" messageClsid="167c7c8e-8300-434c-90f1-d35bb39538fd"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!21">
+							<messageRef location="TickerSymbol"/>
+							<messageTranslation>
+								<msmq:message messageType="StockQuote"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!24">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!24"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="0!28">
+					<portRef location="MakeSoapCall"/>
+					<portTranslation>
+						<com:interface tag="0!24" iid="3046bdbc-6209-4b1e-9761-901dcc890b06" clsid="b9ba440f-ebfb-49e7-ac2e-36267271f067"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!31">
+							<messageRef location="QuoteServiceSoapClient_in"/>
+							<messageTranslation>
+								<com:method tag="0!30" name="QuoteServiceSoapClient" slot="7" dispid="1610809344" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!91">
+									<fieldRef location="document"/>
+									<fieldTranslation>
+										<com:parameter tag="4!91" name="document" byRef="1"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="TickerSymbol"/>
+										<fieldRef location="Document"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding tag="0!32">
+							<messageRef location="QuoteServiceSoapClient_out"/>
+							<messageTranslation>
+								<com:return tag="0!30" name="QuoteServiceSoapClient" slot="7" dispid="1610809344" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!99">
+									<fieldRef location="document"/>
+									<fieldTranslation>
+										<com:parameter tag="4!99" name="document" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!103">
+									<fieldRef location="QuoteServiceSoapClient"/>
+									<fieldTranslation>
+										<com:parameter tag="4!103" name="QuoteServiceSoapClient" index="1" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="0!36">
+					<portRef location="ShowQuote"/>
+					<portTranslation>
+						<com:interface tag="0!34" iid="00020400-0000-0000-c000-000000000046" moniker="script:c:\program files\microsoft biztalk server\xlang scheduler\porequestapproval.wsc"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!39">
+							<messageRef location="SendApproval_in"/>
+							<messageTranslation>
+								<com:method tag="0!38" name="SendApproval" dispid="1" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!66">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<com:parameter tag="4!66" name="Document" byRef="1"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="QuoteServiceSoapClient_out"/>
+										<fieldRef location="QuoteServiceSoapClient"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding tag="0!40">
+							<messageRef location="SendApproval_out"/>
+							<messageTranslation>
+								<com:return tag="0!38" name="SendApproval" dispid="1" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!74">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<com:parameter tag="4!74" name="Document" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!78">
+									<fieldRef location="SendApproval"/>
+									<fieldTranslation>
+										<com:parameter tag="4!78" name="SendApproval" index="1" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+			</portBindingList>
+			<contextBindingList/>
+			<ruleBindingList/>
+			<callBindingList/>
+		</binding>
+	</module>
+</module>

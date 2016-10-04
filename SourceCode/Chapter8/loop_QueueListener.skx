@@ -1,0 +1,439 @@
+<?xml version="1.0"?>
+<!--
+    File created by XLANG Scheduler Engine version 1.0
+    at Sun Sep 08 23:16:13 2002
+
+    '===========================
+    ' Starting the XLANG schedule
+    Set oSked = GetObject("sked://localhost/C:\Apress-PostEdit\SourceCode\Chapter8\loop_QueueListener.skx")
+    sName = oSked.FullyQualifiedName
+
+    '===========================
+    ' Getting proxy for COM port
+    ' Set oPort = oSked.Port("yourPortNameBoundToCOM")
+    ' Call oPort.yourMethod(args ...)
+ 
+
+    '===========================
+    ' Get full queue name (MSMQ port)
+    ' or moniker (COM port)
+    ' sName = oSked.FullPortName("yourPortName")
+-->
+<module xmlns="urn:schemas-microsoft-com:scheduler" xmlns:com="urn:schemas-microsoft-com:comscheduler" xmlns:msmq="urn:schemas-microsoft-com:msmqscheduler">
+	<module name="__LoopModule" identity="29007B2B-9CF7-435F-ADA6-7E87A89EA99C">
+		<schedule>
+			<header>
+				<portList>
+					<port tag="0!37" name="NewMessages"/>
+					<port tag="0!15" name="DoWork"/>
+					<port name="__PORT2"/>
+				</portList>
+				<messageList>
+					<message tag="4!3" name="Constants"/>
+					<message name="__MESSAGE1"/>
+					<message tag="4!37" name="ReceiveMessages"/>
+					<message tag="4!18" name="DoWork_in"/>
+					<message tag="4!18" name="DoWork_out"/>
+				</messageList>
+				<ruleList>
+					<rule tag="0!17" name="Infinite_Loop"/>
+				</ruleList>
+				<contextParameterList/>
+			</header>
+			<map>
+				<switch tag="0!5">
+					<branch tag="0!17">
+						<case>
+							<ruleRef location="Infinite_Loop"/>
+							<messageRef location="Constants"/>
+						</case>
+						<sequence tag="0!10">
+							<block>
+								<sink tag="0!18" comment="New Messages">
+									<portRef location="NewMessages"/>
+									<messageRef location="ReceiveMessages"/>
+								</sink>
+								<synchronous tag="0!10" comment="DoWork">
+									<source tag="0!10" comment="DoWork">
+										<portRef location="DoWork"/>
+										<messageRef location="DoWork_in"/>
+									</source>
+									<sink tag="0!10" comment="DoWork">
+										<portRef location="DoWork"/>
+										<messageRef location="DoWork_out"/>
+									</sink>
+								</synchronous>
+							</block>
+							<call tag="0!26">
+								<moduleRef location="//*[local-name()='module' and @name='__LoopModule' and @identity='29007B2B-9CF7-435F-ADA6-7E87A89EA99C']"/>
+								<portRef location="NewMessages"/>
+								<portRef location="DoWork"/>
+								<portRef location="__PORT2"/>
+								<messageRef location="Constants"/>
+								<messageRef location="__MESSAGE1"/>
+							</call>
+						</sequence>
+					</branch>
+					<default>
+						<sequence>
+							<block>
+								<source tag="0!5">
+									<portRef location="__PORT2"/>
+									<messageRef location="__MESSAGE1"/>
+								</source>
+							</block>
+						</sequence>
+					</default>
+				</switch>
+				<assignmentList>
+					<assignment>
+						<messageRef location="__MESSAGE1"/>
+						<portRef location="NewMessages"/>
+					</assignment>
+					<assignment>
+						<messageRef location="__MESSAGE1"/>
+						<portRef location="DoWork"/>
+					</assignment>
+				</assignmentList>
+			</map>
+		</schedule>
+		<binding>
+			<moduleRef location="ancestor::*[local-name()='module' and *[local-name()='schedule']]"/>
+			<translationHeaderList>
+				<translationHeader>
+					<com:header txnsupport="DISABLED"/>
+				</translationHeader>
+				<translationHeader>
+					<msmq:header/>
+				</translationHeader>
+			</translationHeaderList>
+			<schemaList>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Constants">
+					<ElementType name="ElementType_Constants">
+						<element type="__Instance_Id__"/>
+						<element type="repeat"/>
+					</ElementType>
+					<ElementType name="__Instance_Id__" dt:type="string"/>
+					<ElementType name="repeat" dt:type="i2"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_ReceiveMessages">
+					<ElementType name="ElementType_ReceiveMessages">
+						<element type="Document"/>
+					</ElementType>
+					<ElementType name="Document" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_DoWork_in">
+					<ElementType name="ElementType_DoWork_in">
+						<element type="message"/>
+					</ElementType>
+					<ElementType name="message" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_DoWork_out">
+					<ElementType name="ElementType_DoWork_out">
+						<element type="message"/>
+						<element type="DoWork"/>
+					</ElementType>
+					<ElementType name="message" dt:type="string"/>
+					<ElementType name="DoWork">
+						<element type="com:variant"/>
+					</ElementType>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema___MESSAGE1">
+					<ElementType name="ElementType___MESSAGE1">
+						<element type="NewMessages"/>
+						<element type="DoWork"/>
+					</ElementType>
+					<ElementType name="NewMessages" dt:type="string"/>
+					<ElementType name="DoWork">
+						<element type="com:unknown"/>
+					</ElementType>
+				</Schema>
+			</schemaList>
+			<messageDeclList>
+				<messageDecl>
+					<messageRef location="Constants"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Constants']/*[local-name()='ElementType' and @name='ElementType_Constants']"/>
+					<ElementType_Constants xmlns="x-schema:#Schema_Constants" xmlns:sched="urn:schemas-microsoft-com:scheduler">
+						<__Instance_Id__ sched:tag="4!9">__Instance_Id__</__Instance_Id__>
+						<repeat sched:tag="4!41">3</repeat>
+					</ElementType_Constants>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="ReceiveMessages"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_ReceiveMessages']/*[local-name()='ElementType' and @name='ElementType_ReceiveMessages']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="DoWork_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_DoWork_in']/*[local-name()='ElementType' and @name='ElementType_DoWork_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="DoWork_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_DoWork_out']/*[local-name()='ElementType' and @name='ElementType_DoWork_out']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="__MESSAGE1"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema___MESSAGE1']/*[local-name()='ElementType' and @name='ElementType___MESSAGE1']"/>
+				</messageDecl>
+			</messageDeclList>
+			<portBindingList>
+				<portBinding tag="0!37">
+					<portRef location="NewMessages"/>
+					<portTranslation>
+						<msmq:queue tag="0!28" queueName=".\private$\NewMessages"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!40">
+							<messageRef location="ReceiveMessages"/>
+							<messageTranslation>
+								<msmq:message messageType="ReceiveMessages"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!48">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!48"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="0!15">
+					<portRef location="DoWork"/>
+					<portTranslation>
+						<com:interface tag="0!11" iid="6d9c1199-7561-42d3-8525-d184d0421f11" clsid="7055723f-89a5-428f-856b-fddcbd5b6135"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!21">
+							<messageRef location="DoWork_in"/>
+							<messageTranslation>
+								<com:method tag="0!20" name="DoWork" slot="7" dispid="1610809344" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!25">
+									<fieldRef location="message"/>
+									<fieldTranslation>
+										<com:parameter tag="4!25" name="message" byRef="1"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="ReceiveMessages"/>
+										<fieldRef location="Document"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding tag="0!22">
+							<messageRef location="DoWork_out"/>
+							<messageTranslation>
+								<com:return tag="0!20" name="DoWork" slot="7" dispid="1610809344" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!52">
+									<fieldRef location="message"/>
+									<fieldTranslation>
+										<com:parameter tag="4!52" name="message" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!56">
+									<fieldRef location="DoWork"/>
+									<fieldTranslation>
+										<com:parameter tag="4!56" name="DoWork" index="1" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding>
+					<portRef location="__PORT2"/>
+					<messageBindingList>
+						<messageBinding>
+							<messageRef location="__MESSAGE1"/>
+							<fieldBindingList>
+								<fieldBinding>
+									<fieldRef location="NewMessages"/>
+									<portRef location="NewMessages"/>
+									<raw/>
+								</fieldBinding>
+								<fieldBinding>
+									<fieldRef location="DoWork"/>
+									<portRef location="DoWork"/>
+									<raw/>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+			</portBindingList>
+			<contextBindingList/>
+			<ruleBindingList>
+				<ruleBinding tag="0!17">
+					<ruleRef location="Infinite_Loop"/>
+					<ruleTranslation>
+						<scriptable tag="0!17" expression="Increment_out.Increment &lt;= Constants.repeat"/>
+					</ruleTranslation>
+				</ruleBinding>
+			</ruleBindingList>
+			<callBindingList/>
+		</binding>
+	</module>
+	<module name="loop_QueueListener" identity="52316B1D-217A-4404-B1D7-2A17D6F96F5E">
+		<schedule>
+			<header>
+				<portList>
+					<port tag="0!37" name="NewMessages"/>
+					<port tag="0!15" name="DoWork"/>
+					<port name="__PORT1"/>
+					<port name="__PORT2"/>
+				</portList>
+				<messageList>
+					<message tag="4!3" name="Constants"/>
+					<message name="__MESSAGE1"/>
+				</messageList>
+				<ruleList/>
+				<contextParameterList/>
+			</header>
+			<map>
+				<connect tag="0!5" sharedNames="1">
+					<sequence>
+						<block>
+							<sink tag="0!5">
+								<portRef location="__PORT1"/>
+								<messageRef location="__MESSAGE1"/>
+							</sink>
+						</block>
+						<zero tag="0!7"/>
+					</sequence>
+					<call>
+						<moduleRef location="//*[local-name()='module' and @name='__LoopModule' and @identity='29007B2B-9CF7-435F-ADA6-7E87A89EA99C']"/>
+						<portRef location="NewMessages"/>
+						<portRef location="DoWork"/>
+						<portRef location="__PORT2"/>
+						<messageRef location="Constants"/>
+						<messageRef location="__MESSAGE1"/>
+					</call>
+					<connectionList>
+						<connection>
+							<portRef location="__PORT2"/>
+							<portRef location="__PORT1"/>
+						</connection>
+					</connectionList>
+				</connect>
+				<assignmentList>
+					<assignment>
+						<messageRef location="__MESSAGE1"/>
+						<portRef location="NewMessages"/>
+					</assignment>
+					<assignment>
+						<messageRef location="__MESSAGE1"/>
+						<portRef location="DoWork"/>
+					</assignment>
+				</assignmentList>
+			</map>
+		</schedule>
+		<binding>
+			<moduleRef location="ancestor::*[local-name()='module' and *[local-name()='schedule']]"/>
+			<translationHeaderList>
+				<translationHeader>
+					<com:header txnsupport="DISABLED"/>
+				</translationHeader>
+				<translationHeader>
+					<msmq:header/>
+				</translationHeader>
+			</translationHeaderList>
+			<schemaList>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Constants">
+					<ElementType name="ElementType_Constants">
+						<element type="__Instance_Id__"/>
+						<element type="repeat"/>
+					</ElementType>
+					<ElementType name="__Instance_Id__" dt:type="string"/>
+					<ElementType name="repeat" dt:type="i2"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema___MESSAGE1">
+					<ElementType name="ElementType___MESSAGE1">
+						<element type="NewMessages"/>
+						<element type="DoWork"/>
+					</ElementType>
+					<ElementType name="NewMessages" dt:type="string"/>
+					<ElementType name="DoWork">
+						<element type="com:unknown"/>
+					</ElementType>
+				</Schema>
+			</schemaList>
+			<messageDeclList>
+				<messageDecl>
+					<messageRef location="Constants"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Constants']/*[local-name()='ElementType' and @name='ElementType_Constants']"/>
+					<ElementType_Constants xmlns="x-schema:#Schema_Constants" xmlns:sched="urn:schemas-microsoft-com:scheduler">
+						<__Instance_Id__ sched:tag="4!9">__Instance_Id__</__Instance_Id__>
+						<repeat sched:tag="4!41">3</repeat>
+					</ElementType_Constants>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="__MESSAGE1"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema___MESSAGE1']/*[local-name()='ElementType' and @name='ElementType___MESSAGE1']"/>
+				</messageDecl>
+			</messageDeclList>
+			<portBindingList>
+				<portBinding tag="0!37">
+					<portRef location="NewMessages"/>
+					<portTranslation>
+						<msmq:queue tag="0!28" queueName=".\private$\NewMessages"/>
+					</portTranslation>
+					<messageBindingList/>
+				</portBinding>
+				<portBinding tag="0!15">
+					<portRef location="DoWork"/>
+					<portTranslation>
+						<com:interface tag="0!11" iid="6d9c1199-7561-42d3-8525-d184d0421f11" clsid="7055723f-89a5-428f-856b-fddcbd5b6135"/>
+					</portTranslation>
+					<messageBindingList/>
+				</portBinding>
+				<portBinding>
+					<portRef location="__PORT1"/>
+					<messageBindingList>
+						<messageBinding>
+							<messageRef location="__MESSAGE1"/>
+							<fieldBindingList>
+								<fieldBinding>
+									<fieldRef location="NewMessages"/>
+									<portRef location="NewMessages"/>
+									<raw/>
+								</fieldBinding>
+								<fieldBinding>
+									<fieldRef location="DoWork"/>
+									<portRef location="DoWork"/>
+									<raw/>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding>
+					<portRef location="__PORT2"/>
+					<messageBindingList>
+						<messageBinding>
+							<messageRef location="__MESSAGE1"/>
+							<fieldBindingList>
+								<fieldBinding>
+									<fieldRef location="NewMessages"/>
+									<portRef location="NewMessages"/>
+									<raw/>
+								</fieldBinding>
+								<fieldBinding>
+									<fieldRef location="DoWork"/>
+									<portRef location="DoWork"/>
+									<raw/>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+			</portBindingList>
+			<contextBindingList/>
+			<ruleBindingList/>
+			<callBindingList/>
+		</binding>
+	</module>
+</module>

@@ -1,0 +1,167 @@
+<?xml version="1.0"?>
+<!-- Generated using BizTalk Mapper on Sun, Sep 08 2002 06:34:43 PM -->
+<!-- Copyright (c) Microsoft Corporation. All rights reserved. -->
+<mapsource Name="BizTalk Map" BizTalkServerMapperTool_Version="1.5" Version="1.5" XRange="100" YRange="420"><SrcTree><Schema name="FundInvestorsApp" b:BizTalkServerEditorTool_Version="1.5" b:root_reference="FundInvestorsApp" b:standard="XML" xmlns="urn:schemas-microsoft-com:xml-data" xmlns:b="urn:schemas-microsoft-com:BizTalkServer" xmlns:d="urn:schemas-microsoft-com:datatypes">
+			<b:SelectionFields/>
+			<ElementType name="Record3" content="empty" model="closed">
+				<b:RecordInfo/>
+				<AttributeType name="Value">
+					<b:FieldInfo/></AttributeType>
+				<AttributeType name="Name">
+					<b:FieldInfo/></AttributeType>
+				<attribute type="Name" required="no"/>
+				<attribute type="Value" required="no"/>
+			</ElementType><ElementType name="Record2" content="eltOnly" model="closed">
+				<b:RecordInfo/>
+				<element type="Record3" maxOccurs="*" minOccurs="0"/>
+			</ElementType><ElementType name="Record1" content="empty" model="closed">
+				<b:RecordInfo/>
+				<AttributeType name="Value">
+					<b:FieldInfo/></AttributeType>
+				<AttributeType name="Name">
+					<b:FieldInfo/></AttributeType>
+				<attribute type="Name" required="no"/>
+				<attribute type="Value" required="no"/>
+			</ElementType><ElementType name="FundInvestorsApp" content="eltOnly" model="closed">
+				<b:RecordInfo/>
+				<element type="Record1" maxOccurs="1" minOccurs="0"/>
+				<element type="Record2" maxOccurs="*" minOccurs="0"/>
+			</ElementType></Schema>
+	</SrcTree><TrgTree><Schema name="FundInvestors" b:BizTalkServerEditorTool_Version="1.5" b:root_reference="FundInvestors" b:standard="XML" xmlns="urn:schemas-microsoft-com:xml-data" xmlns:b="urn:schemas-microsoft-com:BizTalkServer" xmlns:d="urn:schemas-microsoft-com:datatypes">
+			<b:SelectionFields><b:Field key="Src_ID_Value" query="*[local-name()='FundCompany' and namespace-uri()='']"/></b:SelectionFields>
+			<ElementType name="ssn" content="textOnly" model="closed" d:type="string">
+				<b:FieldInfo/>
+			</ElementType><ElementType name="phone" content="textOnly" model="closed" d:type="string">
+				<b:FieldInfo/>
+			</ElementType><ElementType name="email" content="textOnly" model="closed" d:type="string">
+				<b:FieldInfo/>
+			</ElementType><ElementType name="balance" content="textOnly" model="closed" d:type="number">
+				<b:FieldInfo/>
+			</ElementType><ElementType name="Status" content="textOnly" model="open">
+				<b:RecordInfo/>
+				<AttributeType name="description" d:type="string">
+					<b:FieldInfo/></AttributeType>
+				<attribute type="description" required="no"/>
+			</ElementType><ElementType name="Investors" content="eltOnly" model="closed">
+				<b:RecordInfo/>
+				<element type="Investor" maxOccurs="*" minOccurs="1"/>
+			</ElementType><ElementType name="InvestorName" content="textOnly" model="closed" d:type="string">
+				<b:FieldInfo/>
+			</ElementType><ElementType name="InvestorInfo" content="eltOnly" model="closed">
+				<b:RecordInfo/>
+				<element type="email" maxOccurs="1" minOccurs="1"/>
+				<element type="phone" maxOccurs="1" minOccurs="1"/>
+				<element type="ssn" maxOccurs="1" minOccurs="1"/>
+				<element type="balance" maxOccurs="1" minOccurs="1"/>
+			</ElementType><ElementType name="Investor" content="eltOnly" order="seq" model="closed">
+				<b:RecordInfo/>
+				<element type="InvestorName" maxOccurs="1" minOccurs="1"/>
+				<element type="Action" maxOccurs="1" minOccurs="1"/>
+				<element type="InvestorInfo" maxOccurs="1" minOccurs="0"/>
+				<element type="Funds" maxOccurs="1" minOccurs="0"/>
+				<element type="Status" maxOccurs="1" minOccurs="0"/>
+			</ElementType><ElementType name="Funds" content="eltOnly" model="closed">
+				<b:RecordInfo/>
+				<element type="Fund" maxOccurs="*" minOccurs="0"/>
+			</ElementType><ElementType name="FundInvestors" content="eltOnly" model="closed">
+				<b:RecordInfo/>
+				<element type="FundCompany" maxOccurs="1" minOccurs="1"/>
+				<element type="Investors" maxOccurs="1" minOccurs="1"/>
+			</ElementType><ElementType name="FundCompany" content="textOnly" model="closed" d:type="string">
+				<b:FieldInfo/>
+			</ElementType><ElementType name="Fund" content="textOnly" model="closed">
+				<b:RecordInfo/>
+				<AttributeType name="transaction" d:type="string">
+					<b:FieldInfo/></AttributeType>
+				<AttributeType name="quantity" d:type="number">
+					<b:FieldInfo/></AttributeType>
+				<AttributeType name="price" d:type="number">
+					<b:FieldInfo/></AttributeType>
+				<AttributeType name="name" d:type="string">
+					<b:FieldInfo/></AttributeType>
+				<attribute type="name" required="no"/>
+				<attribute type="transaction" required="no"/>
+				<attribute type="quantity" required="no"/>
+				<attribute type="price" required="no"/>
+			</ElementType><ElementType name="Action" content="textOnly" model="closed" d:type="enumeration" d:values="OpenAccount CloseAccount Trade">
+				<b:FieldInfo/>
+			</ElementType></Schema>
+	</TrgTree><TreeValues><ConstantValues><Value value="1" Query="/FundInvestors/Investors/Investor/InvestorInfo/ssn"/><Value value="1" Query="/FundInvestors/Investors/Investor/InvestorInfo/phone"/><Value value="1" Query="/FundInvestors/Investors/Investor/InvestorInfo/balance"/></ConstantValues>
+	</TreeValues><Pages><Page Name="Page 1"><Links><Link LinkID="1" LinkFrom="/FundInvestorsApp/Record1/@Name" LinkTo="1"/><Link LinkID="2" LinkFrom="1" LinkTo="2"/><Link LinkID="3" LinkFrom="/FundInvestorsApp/Record1/@Value" LinkTo="2"/><Link LinkID="4" LinkFrom="2" LinkTo="/FundInvestors/FundCompany"/><Link LinkID="5" LinkFrom="/FundInvestorsApp/Record2/Record3/@Name" LinkTo="3"/><Link LinkID="6" LinkFrom="/FundInvestorsApp/Record2/Record3/@Name" LinkTo="4"/><Link LinkID="7" LinkFrom="/FundInvestorsApp/Record2/Record3/@Name" LinkTo="5"/><Link LinkID="8" LinkFrom="3" LinkTo="6"/><Link LinkID="9" LinkFrom="4" LinkTo="8"/><Link LinkID="10" LinkFrom="5" LinkTo="7"/><Link LinkID="11" LinkFrom="/FundInvestorsApp/Record2/Record3/@Value" LinkTo="6"/><Link LinkID="12" LinkFrom="/FundInvestorsApp/Record2/Record3/@Value" LinkTo="8"/><Link LinkID="13" LinkFrom="/FundInvestorsApp/Record2/Record3/@Value" LinkTo="7"/><Link LinkID="14" LinkFrom="6" LinkTo="/FundInvestors/Investors/Investor/InvestorName"/><Link LinkID="15" LinkFrom="8" LinkTo="/FundInvestors/Investors/Investor/InvestorInfo/email"/><Link LinkID="16" LinkFrom="7" LinkTo="/FundInvestors/Investors/Investor/Action"/></Links><Functoids><Functoid FunctoidID="1" X-Cell="54" Y-Cell="212" Functoid-FID="315" Functoid-Version="1" Script-Functoid="no"><Input-Parameters><Parameter Type="Link" Value="1"/><Parameter Type="Constant" Value="FundCompany"/></Input-Parameters></Functoid><Functoid FunctoidID="2" X-Cell="57" Y-Cell="214" Functoid-FID="375" Functoid-Version="1" Script-Functoid="no"><Input-Parameters><Parameter Type="Link" Value="2"/><Parameter Type="Link" Value="3"/></Input-Parameters></Functoid><Functoid FunctoidID="3" X-Cell="53" Y-Cell="215" Functoid-FID="315" Functoid-Version="1" Script-Functoid="no"><Input-Parameters><Parameter Type="Constant" Value="InvestorName"/><Parameter Type="Link" Value="5"/></Input-Parameters></Functoid><Functoid FunctoidID="4" X-Cell="53" Y-Cell="218" Functoid-FID="315" Functoid-Version="1" Script-Functoid="no"><Input-Parameters><Parameter Type="Constant" Value="Email"/><Parameter Type="Link" Value="6"/></Input-Parameters></Functoid><Functoid FunctoidID="5" X-Cell="53" Y-Cell="220" Functoid-FID="315" Functoid-Version="1" Script-Functoid="no"><Input-Parameters><Parameter Type="Constant" Value="Action"/><Parameter Type="Link" Value="7"/></Input-Parameters></Functoid><Functoid FunctoidID="6" X-Cell="57" Y-Cell="215" Functoid-FID="374" Functoid-Version="1" Script-Functoid="no"><Input-Parameters><Parameter Type="Link" Value="8"/><Parameter Type="Link" Value="11"/></Input-Parameters></Functoid><Functoid FunctoidID="7" X-Cell="54" Y-Cell="223" Functoid-FID="374" Functoid-Version="1" Script-Functoid="no"><Input-Parameters><Parameter Type="Link" Value="10"/><Parameter Type="Link" Value="13"/></Input-Parameters></Functoid><Functoid FunctoidID="8" X-Cell="56" Y-Cell="222" Functoid-FID="374" Functoid-Version="1" Script-Functoid="no"><Input-Parameters><Parameter Type="Link" Value="9"/><Parameter Type="Link" Value="12"/></Input-Parameters></Functoid></Functoids></Page></Pages><CompiledXSL><xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:msxsl="urn:schemas-microsoft-com:xslt" xmlns:var="urn:var" xmlns:userVBScript="urn:userVBScript" xmlns:userJScript="urn:userJScript" exclude-result-prefixes="msxsl var userVBScript userJScript" version="1.0">
+			<xsl:output method="xml" omit-xml-declaration="yes"/>
+			<xsl:template match="/">
+				<xsl:apply-templates select="FundInvestorsApp"/>
+			</xsl:template>
+			<xsl:template match="FundInvestorsApp">
+				<FundInvestors>
+					<xsl:variable name="var:v1" select="userVBScript:fctequal(string(Record1/@Name),&quot;FundCompany&quot;)"/>
+					<xsl:if test="string($var:v1)=&quot;true&quot;">
+						<xsl:variable name="var:v2" select="Record1/@Value"/>
+						<FundCompany><xsl:value-of select="$var:v2"/></FundCompany>
+					</xsl:if>
+					<Investors>
+						<xsl:for-each select="Record2">
+							<Investor>
+								<xsl:for-each select="Record3">
+									<xsl:variable name="var:v3" select="userVBScript:fctequal(&quot;InvestorName&quot;,string(@Name))"/>
+									<xsl:if test="string($var:v3)=&quot;true&quot;">
+										<xsl:variable name="var:v4" select="@Value"/>
+										<InvestorName><xsl:value-of select="$var:v4"/></InvestorName>
+									</xsl:if>
+								</xsl:for-each>
+								<xsl:for-each select="Record3">
+									<xsl:variable name="var:v5" select="userVBScript:fctequal(&quot;Action&quot;,string(@Name))"/>
+									<xsl:if test="string($var:v5)=&quot;true&quot;">
+										<xsl:variable name="var:v6" select="@Value"/>
+										<Action><xsl:value-of select="$var:v6"/></Action>
+									</xsl:if>
+								</xsl:for-each>
+								<InvestorInfo>
+									<xsl:for-each select="Record3">
+										<xsl:variable name="var:v7" select="userVBScript:fctequal(&quot;Email&quot;,string(@Name))"/>
+										<xsl:if test="string($var:v7)=&quot;true&quot;">
+											<xsl:variable name="var:v8" select="@Value"/>
+											<email><xsl:value-of select="$var:v8"/></email>
+										</xsl:if>
+									</xsl:for-each>
+									<phone>1</phone>
+									<ssn>1</ssn>
+									<balance>1</balance>
+								</InvestorInfo>
+							</Investor>
+						</xsl:for-each>
+					</Investors>
+				</FundInvestors>
+			</xsl:template>
+			<msxsl:script language="VBScript" implements-prefix="userVBScript">
+				<![CDATA[
+Function FctEqual( p_strA, p_strB )
+    If LCase( p_strA ) = "true" Then
+        p_strA = true
+    ElseIf LCase( p_strA ) = "false" Then
+        p_strA = false
+    End If
+    If LCase( p_strB ) = "true" Then
+        p_strB = true
+    ElseIf LCase( p_strB ) = "false" Then
+        p_strB = false
+    End If
+    If ( IsNumeric( p_strA ) And IsNumeric( p_strB ) ) Then
+        p_strA = CDbl( p_strA )
+        p_strB = CDbl( p_strB )
+    End If
+    If ( p_strA = p_strB ) Then
+        FctEqual = true
+    Else
+        FctEqual = false
+    End If
+End Function
+
+]]>
+			</msxsl:script>
+			<msxsl:script language="JScript" implements-prefix="userJScript">
+				<![CDATA[
+]]>
+			</msxsl:script>
+		</xsl:stylesheet>
+	</CompiledXSL></mapsource>

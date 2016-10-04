@@ -1,0 +1,785 @@
+<?xml version="1.0"?>
+<!--
+    File created by XLANG Scheduler Engine version 1.0
+    at Sun Sep 08 19:16:01 2002
+
+    '===========================
+    ' Starting the XLANG schedule
+    Set oSked = GetObject("sked://localhost/C:\Apress-PostEdit\SourceCode\Chapter10\MSMQCorrelationTrade.skx")
+    sName = oSked.FullyQualifiedName
+
+    '===========================
+    ' Getting proxy for COM port
+    ' Set oPort = oSked.Port("yourPortNameBoundToCOM")
+    ' Call oPort.yourMethod(args ...)
+ 
+
+    '===========================
+    ' Get full queue name (MSMQ port)
+    ' or moniker (COM port)
+    ' sName = oSked.FullPortName("yourPortName")
+-->
+<module xmlns="urn:schemas-microsoft-com:scheduler" xmlns:com="urn:schemas-microsoft-com:comscheduler" xmlns:msmq="urn:schemas-microsoft-com:msmqscheduler">
+	<module name="MSMQCorrelationTrade" identity="4B658AD4-E941-4EE7-A1A7-0F4DD1FCD254">
+		<schedule>
+			<header>
+				<portList>
+					<port tag="0!30" name="ReceiveDoc"/>
+					<port tag="0!55" name="SendOrderToQueue"/>
+					<port tag="0!116" name="ReceiveOrderFromQueue"/>
+					<port name="__PORT3"/>
+					<port tag="0!40" name="Pre-Trade"/>
+					<port tag="5!57" name="SentToErrorQueue"/>
+					<port tag="7!64" name="UpdateDBForError"/>
+					<port tag="8!46" name="SendToAdmin"/>
+					<port name="__PORT4"/>
+					<port tag="0!60" name="Post_Trade"/>
+					<port tag="0!72" name="SendTradeStatus"/>
+				</portList>
+				<messageList>
+					<message tag="4!3" name="Constants"/>
+					<message tag="4!17" name="TradeDocument"/>
+					<message tag="4!59" name="TradeOrderToQueue"/>
+					<message tag="4!74" name="TradeOrderFromQueue"/>
+					<message name="__MESSAGE3"/>
+					<message tag="4!32" name="TradeOrderInProcess_in"/>
+					<message tag="4!32" name="TradeOrderInProcess_out"/>
+					<message tag="4!170" name="OriginalDocToErrorQueue"/>
+					<message tag="4!187" name="TradeOrderError_in"/>
+					<message tag="4!187" name="TradeOrderError_out"/>
+					<message tag="4!132" name="AdminEmail"/>
+					<message name="__MESSAGE4"/>
+					<message tag="4!86" name="TradeOrderComplete_in"/>
+					<message tag="4!86" name="TradeOrderComplete_out"/>
+					<message tag="4!113" name="TradeStatusDocument"/>
+				</messageList>
+				<ruleList/>
+				<contextParameterList/>
+			</header>
+			<sequence tag="0!11">
+				<block>
+					<sink tag="0!11" comment="Receive Doc">
+						<portRef location="ReceiveDoc"/>
+						<messageRef location="TradeDocument"/>
+					</sink>
+				</block>
+				<connect tag="0!97" sharedNames="1">
+					<sequence>
+						<block>
+							<sink tag="0!47" comment="__Sink">
+								<portRef location="__PORT4"/>
+								<messageRef location="__MESSAGE4"/>
+							</sink>
+						</block>
+						<sequence tag="0!10">
+							<block>
+								<silence tag="0!10" comment="Post-Trade Proc"/>
+							</block>
+							<sequence tag="0!13">
+								<block>
+									<context tag="0!10" name="Post-Trade_Proc">
+										<transaction/>
+										<catch>
+											<sequence tag="6!61">
+												<block>
+													<source tag="6!60" comment="Send email to Adminstrator">
+														<portRef location="SendToAdmin"/>
+														<messageRef location="AdminEmail"/>
+													</source>
+													<source tag="6!61" comment="Send response doc to error queue">
+														<portRef location="SentToErrorQueue"/>
+														<messageRef location="TradeStatusDocument"/>
+													</source>
+												</block>
+												<zero tag="6!62"/>
+											</sequence>
+										</catch>
+									</context>
+									<synchronous tag="0!7" comment="Post-Trade Database Update">
+										<source tag="0!7" comment="Post-Trade Database Update">
+											<portRef location="Post_Trade"/>
+											<messageRef location="TradeOrderComplete_in"/>
+										</source>
+										<sink tag="0!7" comment="Post-Trade Database Update">
+											<portRef location="Post_Trade"/>
+											<messageRef location="TradeOrderComplete_out"/>
+										</sink>
+									</synchronous>
+									<source tag="0!8" comment="Sending Trade Status Back">
+										<portRef location="SendTradeStatus"/>
+										<messageRef location="TradeStatusDocument"/>
+									</source>
+								</block>
+								<zero tag="0!9"/>
+							</sequence>
+						</sequence>
+					</sequence>
+					<sequence tag="0!16">
+						<context tag="0!97" name="Long_Tx">
+							<catch>
+								<sequence tag="8!68">
+									<block>
+										<source tag="8!67" comment="Send email for Long Tx">
+											<portRef location="SendToAdmin"/>
+											<messageRef location="AdminEmail"/>
+										</source>
+										<silence tag="8!68" comment="End"/>
+									</block>
+									<sequence>
+										<block>
+											<context tag="8!68" name="__CONTEXT1">
+												<transaction/>
+											</context>
+											<silence tag="8!68" comment="End"/>
+										</block>
+										<sequence>
+											<block>
+												<source tag="0!47" comment="__Source">
+													<portRef location="__PORT3"/>
+													<messageRef location="__MESSAGE3"/>
+												</source>
+											</block>
+											<zero/>
+										</sequence>
+									</sequence>
+								</sequence>
+							</catch>
+						</context>
+						<block>
+							<silence tag="0!16" comment="Trade Proc"/>
+						</block>
+						<sequence tag="0!12">
+							<block>
+								<context tag="0!16" name="Trade_Proc">
+									<transaction/>
+									<compensation>
+										<sequence tag="7!70">
+											<block>
+												<synchronous tag="7!67" comment="UpdateDB for error">
+													<source tag="7!67" comment="UpdateDB for error">
+														<portRef location="UpdateDBForError"/>
+														<messageRef location="TradeOrderError_in"/>
+													</source>
+													<sink tag="7!67" comment="UpdateDB for error">
+														<portRef location="UpdateDBForError"/>
+														<messageRef location="TradeOrderError_out"/>
+													</sink>
+												</synchronous>
+												<source tag="7!70" comment="Send orignal doc to queue">
+													<portRef location="SentToErrorQueue"/>
+													<messageRef location="OriginalDocToErrorQueue"/>
+												</source>
+											</block>
+											<zero tag="7!68"/>
+										</sequence>
+									</compensation>
+									<catch>
+										<sequence tag="5!68">
+											<block>
+												<source tag="5!68" comment="Send orginal document to Queue">
+													<portRef location="SentToErrorQueue"/>
+													<messageRef location="OriginalDocToErrorQueue"/>
+												</source>
+											</block>
+											<zero tag="5!67"/>
+										</sequence>
+									</catch>
+								</context>
+								<synchronous tag="0!5" comment="Pre-Trade Database Update">
+									<source tag="0!5" comment="Pre-Trade Database Update">
+										<portRef location="Pre-Trade"/>
+										<messageRef location="TradeOrderInProcess_in"/>
+									</source>
+									<sink tag="0!5" comment="Pre-Trade Database Update">
+										<portRef location="Pre-Trade"/>
+										<messageRef location="TradeOrderInProcess_out"/>
+									</sink>
+								</synchronous>
+							</block>
+							<sequence tag="0!47">
+								<block>
+									<source tag="0!6" comment="SendTradeOrderToQueue">
+										<portRef location="SendOrderToQueue"/>
+										<messageRef location="TradeOrderToQueue"/>
+									</source>
+									<sink tag="0!22" comment="ReceiveTradeOrderFromQueue">
+										<portRef location="ReceiveOrderFromQueue"/>
+										<messageRef location="TradeOrderFromQueue"/>
+									</sink>
+									<release tag="0!97" comment="Long Tx">
+										<contextRef location="Long_Tx"/>
+									</release>
+									<source tag="0!47" comment="__Source">
+										<portRef location="__PORT3"/>
+										<messageRef location="__MESSAGE3"/>
+									</source>
+								</block>
+								<zero/>
+							</sequence>
+						</sequence>
+					</sequence>
+					<connectionList>
+						<connection>
+							<portRef location="__PORT4"/>
+							<portRef location="__PORT3"/>
+						</connection>
+					</connectionList>
+				</connect>
+			</sequence>
+		</schedule>
+		<binding>
+			<moduleRef location="ancestor::*[local-name()='module' and *[local-name()='schedule']]"/>
+			<translationHeaderList>
+				<translationHeader>
+					<com:header txnsupport="DISABLED"/>
+				</translationHeader>
+				<translationHeader>
+					<msmq:header/>
+				</translationHeader>
+			</translationHeaderList>
+			<schemaList>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Constants">
+					<ElementType name="ElementType_Constants">
+						<element type="__Instance_Id__"/>
+						<element type="source"/>
+						<element type="AdminEmailDoc"/>
+					</ElementType>
+					<ElementType name="__Instance_Id__" dt:type="string"/>
+					<ElementType name="source" dt:type="string"/>
+					<ElementType name="AdminEmailDoc" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_TradeDocument">
+					<ElementType name="ElementType_TradeDocument">
+						<element type="Document"/>
+						<element type="FundCompany"/>
+					</ElementType>
+					<ElementType name="Document" dt:type="string"/>
+					<ElementType name="FundCompany" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_TradeOrderInProcess_in">
+					<ElementType name="ElementType_TradeOrderInProcess_in">
+						<element type="doc"/>
+					</ElementType>
+					<ElementType name="doc" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_TradeOrderInProcess_out">
+					<ElementType name="ElementType_TradeOrderInProcess_out">
+						<element type="doc"/>
+						<element type="TradeOrderInProcess"/>
+					</ElementType>
+					<ElementType name="doc" dt:type="string"/>
+					<ElementType name="TradeOrderInProcess">
+						<element type="com:variant"/>
+					</ElementType>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema___MESSAGE1">
+					<ElementType name="ElementType___MESSAGE1"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_OriginalDocToErrorQueue">
+					<ElementType name="ElementType_OriginalDocToErrorQueue">
+						<element type="Document"/>
+					</ElementType>
+					<ElementType name="Document" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_TradeOrderError_in">
+					<ElementType name="ElementType_TradeOrderError_in">
+						<element type="doc"/>
+					</ElementType>
+					<ElementType name="doc" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_TradeOrderError_out">
+					<ElementType name="ElementType_TradeOrderError_out">
+						<element type="doc"/>
+						<element type="TradeOrderError"/>
+					</ElementType>
+					<ElementType name="doc" dt:type="string"/>
+					<ElementType name="TradeOrderError">
+						<element type="com:variant"/>
+					</ElementType>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_TradeOrderToQueue">
+					<ElementType name="ElementType_TradeOrderToQueue">
+						<element type="Document"/>
+					</ElementType>
+					<ElementType name="Document" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_TradeOrderFromQueue">
+					<ElementType name="ElementType_TradeOrderFromQueue">
+						<element type="Document"/>
+					</ElementType>
+					<ElementType name="Document" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_AdminEmail">
+					<ElementType name="ElementType_AdminEmail">
+						<element type="Document"/>
+						<element type="Source"/>
+						<element type="FundCompany"/>
+					</ElementType>
+					<ElementType name="Document" dt:type="string"/>
+					<ElementType name="Source" dt:type="string"/>
+					<ElementType name="FundCompany" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_TradeOrderComplete_in">
+					<ElementType name="ElementType_TradeOrderComplete_in">
+						<element type="doc"/>
+					</ElementType>
+					<ElementType name="doc" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_TradeOrderComplete_out">
+					<ElementType name="ElementType_TradeOrderComplete_out">
+						<element type="doc"/>
+						<element type="TradeOrderComplete"/>
+					</ElementType>
+					<ElementType name="doc" dt:type="string"/>
+					<ElementType name="TradeOrderComplete">
+						<element type="com:variant"/>
+					</ElementType>
+				</Schema>
+			</schemaList>
+			<messageDeclList>
+				<messageDecl>
+					<messageRef location="Constants"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Constants']/*[local-name()='ElementType' and @name='ElementType_Constants']"/>
+					<ElementType_Constants xmlns="x-schema:#Schema_Constants" xmlns:sched="urn:schemas-microsoft-com:scheduler">
+						<__Instance_Id__ sched:tag="4!9">__Instance_Id__</__Instance_Id__>
+						<source sched:tag="4!159">Trade schedule</source>
+						<AdminEmailDoc sched:tag="4!153">&lt;AdminEmail Source="" FundCompany=""/&gt;</AdminEmailDoc>
+					</ElementType_Constants>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="TradeDocument"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_TradeDocument']/*[local-name()='ElementType' and @name='ElementType_TradeDocument']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="TradeOrderInProcess_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_TradeOrderInProcess_in']/*[local-name()='ElementType' and @name='ElementType_TradeOrderInProcess_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="TradeOrderInProcess_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_TradeOrderInProcess_out']/*[local-name()='ElementType' and @name='ElementType_TradeOrderInProcess_out']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="OriginalDocToErrorQueue"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_OriginalDocToErrorQueue']/*[local-name()='ElementType' and @name='ElementType_OriginalDocToErrorQueue']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="TradeOrderError_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_TradeOrderError_in']/*[local-name()='ElementType' and @name='ElementType_TradeOrderError_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="TradeOrderError_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_TradeOrderError_out']/*[local-name()='ElementType' and @name='ElementType_TradeOrderError_out']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="TradeOrderToQueue"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_TradeOrderToQueue']/*[local-name()='ElementType' and @name='ElementType_TradeOrderToQueue']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="TradeOrderFromQueue"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_TradeOrderFromQueue']/*[local-name()='ElementType' and @name='ElementType_TradeOrderFromQueue']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="__MESSAGE3"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema___MESSAGE1']/*[local-name()='ElementType' and @name='ElementType___MESSAGE1']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="__MESSAGE4"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema___MESSAGE1']/*[local-name()='ElementType' and @name='ElementType___MESSAGE1']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="AdminEmail"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_AdminEmail']/*[local-name()='ElementType' and @name='ElementType_AdminEmail']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="TradeOrderComplete_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_TradeOrderComplete_in']/*[local-name()='ElementType' and @name='ElementType_TradeOrderComplete_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="TradeOrderComplete_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_TradeOrderComplete_out']/*[local-name()='ElementType' and @name='ElementType_TradeOrderComplete_out']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="TradeStatusDocument"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_OriginalDocToErrorQueue']/*[local-name()='ElementType' and @name='ElementType_OriginalDocToErrorQueue']"/>
+				</messageDecl>
+			</messageDeclList>
+			<portBindingList>
+				<portBinding tag="0!30">
+					<portRef location="ReceiveDoc"/>
+					<portTranslation>
+						<msmq:queue tag="0!25" queueName="bts://&amp;ReceiveDoc&amp;.\private$\ReceiveDoc" wellKnown="0" queueInfoClsid="27f4275d-707c-4047-a77b-56a5d0eb034f" messageClsid="167c7c8e-8300-434c-90f1-d35bb39538fd"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!33">
+							<messageRef location="TradeDocument"/>
+							<messageTranslation>
+								<msmq:message messageType="Trade"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!24">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!24"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!163">
+									<fieldRef location="FundCompany"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!163" xPath="/Trade/FundCompany"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="0!40">
+					<portRef location="Pre-Trade"/>
+					<portTranslation>
+						<com:interface tag="0!36" iid="43c025d6-52ca-4ff9-bd81-955c070a3d9d" clsid="7510a22f-6550-4cbc-b94c-066161462940" txnsupport="SUPPORTED" autoReturn="1"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!43">
+							<messageRef location="TradeOrderInProcess_in"/>
+							<messageTranslation>
+								<com:method tag="0!42" name="TradeOrderInProcess" slot="7" dispid="1610809344" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!39">
+									<fieldRef location="doc"/>
+									<fieldTranslation>
+										<com:parameter tag="4!39" name="doc" byRef="1"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="TradeDocument"/>
+										<fieldRef location="Document"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding tag="0!44">
+							<messageRef location="TradeOrderInProcess_out"/>
+							<messageTranslation>
+								<com:return tag="0!42" name="TradeOrderInProcess" slot="7" dispid="1610809344" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!47">
+									<fieldRef location="doc"/>
+									<fieldTranslation>
+										<com:parameter tag="4!47" name="doc" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!51">
+									<fieldRef location="TradeOrderInProcess"/>
+									<fieldTranslation>
+										<com:parameter tag="4!51" name="TradeOrderInProcess" index="1" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="5!57">
+					<portRef location="SentToErrorQueue"/>
+					<portTranslation>
+						<msmq:queue tag="5!51" queueName=".\private$\ErrorQueue"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="5!71">
+							<messageRef location="OriginalDocToErrorQueue"/>
+							<messageTranslation>
+								<msmq:message messageType="Trade"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!177">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!177"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="TradeDocument"/>
+										<fieldRef location="Document"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding tag="6!69">
+							<messageRef location="TradeStatusDocument"/>
+							<messageTranslation>
+								<msmq:message messageType="Trade"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding>
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!120"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="TradeOrderFromQueue"/>
+										<fieldRef location="Document"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="7!64">
+					<portRef location="UpdateDBForError"/>
+					<portTranslation>
+						<com:interface tag="7!60" iid="43c025d6-52ca-4ff9-bd81-955c070a3d9d" clsid="7510a22f-6550-4cbc-b94c-066161462940" txnsupport="SUPPORTED"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="7!75">
+							<messageRef location="TradeOrderError_in"/>
+							<messageTranslation>
+								<com:method tag="7!66" name="TradeOrderError" slot="8" dispid="1610809345" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!194">
+									<fieldRef location="doc"/>
+									<fieldTranslation>
+										<com:parameter tag="4!194" name="doc" byRef="1"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="TradeDocument"/>
+										<fieldRef location="Document"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding tag="7!76">
+							<messageRef location="TradeOrderError_out"/>
+							<messageTranslation>
+								<com:return tag="7!66" name="TradeOrderError" slot="8" dispid="1610809345" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!202">
+									<fieldRef location="doc"/>
+									<fieldTranslation>
+										<com:parameter tag="4!202" name="doc" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!206">
+									<fieldRef location="TradeOrderError"/>
+									<fieldTranslation>
+										<com:parameter tag="4!206" name="TradeOrderError" index="1" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="0!55">
+					<portRef location="SendOrderToQueue"/>
+					<portTranslation>
+						<msmq:queue tag="0!49" queueName=".\private$\NewTradeOrder"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!98">
+							<messageRef location="TradeOrderToQueue"/>
+							<messageTranslation>
+								<msmq:message messageType="__Instance_Id__" labelIsInstanceID="1"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!66">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!66"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="TradeDocument"/>
+										<fieldRef location="Document"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="0!116">
+					<portRef location="ReceiveOrderFromQueue"/>
+					<portTranslation>
+						<msmq:queue tag="0!109" queueName=".\private$\ProcessedTradeOrder"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!119">
+							<messageRef location="TradeOrderFromQueue"/>
+							<messageTranslation>
+								<msmq:message messageType="test" labelIsInstanceID="1"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!81">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!81"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+							<latency>200</latency>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding>
+					<portRef location="__PORT3"/>
+					<messageBindingList>
+						<messageBinding>
+							<messageRef location="__MESSAGE3"/>
+							<fieldBindingList/>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding>
+					<portRef location="__PORT4"/>
+					<messageBindingList>
+						<messageBinding>
+							<messageRef location="__MESSAGE4"/>
+							<fieldBindingList/>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="8!46">
+					<portRef location="SendToAdmin"/>
+					<portTranslation>
+						<msmq:queue tag="8!41" queueName="bts://&amp;C_AdminEmail" wellKnown="1" queueInfoClsid="27f4275d-707c-4047-a77b-56a5d0eb034f" messageClsid="167c7c8e-8300-434c-90f1-d35bb39538fd"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="6!66">
+							<messageRef location="AdminEmail"/>
+							<messageTranslation>
+								<msmq:message messageType="AdminEmail"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!139">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!139"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="Constants"/>
+										<fieldRef location="AdminEmailDoc"/>
+									</from>
+								</fieldBinding>
+								<fieldBinding tag="4!143">
+									<fieldRef location="Source"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!143" xPath="/AdminEmail/@Source"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="Constants"/>
+										<fieldRef location="source"/>
+									</from>
+								</fieldBinding>
+								<fieldBinding tag="4!147">
+									<fieldRef location="FundCompany"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!147" xPath="/AdminEmail/@FundCompany"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="TradeDocument"/>
+										<fieldRef location="FundCompany"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="0!60">
+					<portRef location="Post_Trade"/>
+					<portTranslation>
+						<com:interface tag="0!56" iid="43c025d6-52ca-4ff9-bd81-955c070a3d9d" clsid="7510a22f-6550-4cbc-b94c-066161462940" txnsupport="SUPPORTED" autoReturn="1"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!63">
+							<messageRef location="TradeOrderComplete_in"/>
+							<messageTranslation>
+								<com:method tag="0!62" name="TradeOrderComplete" slot="9" dispid="1610809346" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!93">
+									<fieldRef location="doc"/>
+									<fieldTranslation>
+										<com:parameter tag="4!93" name="doc" byRef="1"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="TradeOrderFromQueue"/>
+										<fieldRef location="Document"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding tag="0!64">
+							<messageRef location="TradeOrderComplete_out"/>
+							<messageTranslation>
+								<com:return tag="0!62" name="TradeOrderComplete" slot="9" dispid="1610809346" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!101">
+									<fieldRef location="doc"/>
+									<fieldTranslation>
+										<com:parameter tag="4!101" name="doc" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!105">
+									<fieldRef location="TradeOrderComplete"/>
+									<fieldTranslation>
+										<com:parameter tag="4!105" name="TradeOrderComplete" index="1" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="0!72">
+					<portRef location="SendTradeStatus"/>
+					<portTranslation>
+						<msmq:queue tag="0!66" queueName=".\private$\TradeStatus"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!75">
+							<messageRef location="TradeStatusDocument"/>
+							<messageTranslation>
+								<msmq:message messageType="Trade"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!120">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!120"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="TradeOrderFromQueue"/>
+										<fieldRef location="Document"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+			</portBindingList>
+			<contextBindingList>
+				<contextBinding>
+					<contextRef location="Long_Tx"/>
+					<retry>0</retry>
+					<backoff>0</backoff>
+				</contextBinding>
+				<contextBinding>
+					<contextRef location="Trade_Proc"/>
+					<retry>0</retry>
+					<backoff>20</backoff>
+					<timeout>600</timeout>
+				</contextBinding>
+				<contextBinding>
+					<contextRef location="__CONTEXT1"/>
+					<retry>0</retry>
+					<backoff>0</backoff>
+				</contextBinding>
+				<contextBinding>
+					<contextRef location="Post-Trade_Proc"/>
+					<retry>0</retry>
+					<backoff>20</backoff>
+					<timeout>600</timeout>
+				</contextBinding>
+			</contextBindingList>
+			<ruleBindingList/>
+			<callBindingList/>
+		</binding>
+	</module>
+</module>

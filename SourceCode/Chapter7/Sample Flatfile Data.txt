@@ -1,0 +1,3 @@
+Mike,Fix Income Fund,100
+Bob,Growth Fund,100
+Joe,Growth Fund,150~,000~,000

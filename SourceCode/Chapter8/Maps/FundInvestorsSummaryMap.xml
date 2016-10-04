@@ -1,0 +1,133 @@
+<?xml version="1.0"?>
+<!-- Generated using BizTalk Mapper on Sun, Sep 08 2002 06:34:31 PM -->
+<!-- Copyright (c) Microsoft Corporation. All rights reserved. -->
+<mapsource Name="BizTalk Map" BizTalkServerMapperTool_Version="1.5" Version="1.5" XRange="100" YRange="420"><SrcTree><Schema name="FundInvestors" b:BizTalkServerEditorTool_Version="1.5" b:root_reference="FundInvestors" b:standard="XML" xmlns="urn:schemas-microsoft-com:xml-data" xmlns:b="urn:schemas-microsoft-com:BizTalkServer" xmlns:d="urn:schemas-microsoft-com:datatypes">
+			<b:SelectionFields><b:Field key="Src_ID_Value" query="*[local-name()='FundCompany' and namespace-uri()='']"/></b:SelectionFields>
+			<ElementType name="ssn" content="textOnly" model="closed" d:type="string">
+				<b:FieldInfo/>
+			</ElementType><ElementType name="phone" content="textOnly" model="closed" d:type="string">
+				<b:FieldInfo/>
+			</ElementType><ElementType name="email" content="textOnly" model="closed" d:type="string">
+				<b:FieldInfo/>
+			</ElementType><ElementType name="balance" content="textOnly" model="closed" d:type="number">
+				<b:FieldInfo/>
+			</ElementType><ElementType name="Status" content="textOnly" model="open">
+				<b:RecordInfo/>
+				<AttributeType name="description" d:type="string">
+					<b:FieldInfo/></AttributeType>
+				<attribute type="description" required="no"/>
+			</ElementType><ElementType name="Investors" content="eltOnly" model="closed">
+				<b:RecordInfo/>
+				<element type="Investor" maxOccurs="*" minOccurs="1"/>
+			</ElementType><ElementType name="InvestorName" content="textOnly" model="closed" d:type="string">
+				<b:FieldInfo/>
+			</ElementType><ElementType name="InvestorInfo" content="eltOnly" model="closed">
+				<b:RecordInfo/>
+				<element type="email" maxOccurs="1" minOccurs="1"/>
+				<element type="phone" maxOccurs="1" minOccurs="1"/>
+				<element type="ssn" maxOccurs="1" minOccurs="1"/>
+				<element type="balance" maxOccurs="1" minOccurs="1"/>
+			</ElementType><ElementType name="Investor" content="eltOnly" order="seq" model="closed">
+				<b:RecordInfo/>
+				<element type="InvestorName" maxOccurs="1" minOccurs="1"/>
+				<element type="Action" maxOccurs="1" minOccurs="1"/>
+				<element type="InvestorInfo" maxOccurs="1" minOccurs="0"/>
+				<element type="Funds" maxOccurs="1" minOccurs="0"/>
+				<element type="Status" maxOccurs="1" minOccurs="0"/>
+			</ElementType><ElementType name="Funds" content="eltOnly" model="closed">
+				<b:RecordInfo/>
+				<element type="Fund" maxOccurs="*" minOccurs="0"/>
+			</ElementType><ElementType name="FundInvestors" content="eltOnly" model="closed">
+				<b:RecordInfo/>
+				<element type="FundCompany" maxOccurs="1" minOccurs="1"/>
+				<element type="Investors" maxOccurs="1" minOccurs="1"/>
+			</ElementType><ElementType name="FundCompany" content="textOnly" model="closed" d:type="string">
+				<b:FieldInfo/>
+			</ElementType><ElementType name="Fund" content="textOnly" model="closed">
+				<b:RecordInfo/>
+				<AttributeType name="transaction" d:type="string">
+					<b:FieldInfo/></AttributeType>
+				<AttributeType name="quantity" d:type="number">
+					<b:FieldInfo/></AttributeType>
+				<AttributeType name="price" d:type="number">
+					<b:FieldInfo/></AttributeType>
+				<AttributeType name="name" d:type="string">
+					<b:FieldInfo/></AttributeType>
+				<attribute type="name" required="no"/>
+				<attribute type="transaction" required="no"/>
+				<attribute type="quantity" required="no"/>
+				<attribute type="price" required="no"/>
+			</ElementType><ElementType name="Action" content="textOnly" model="closed" d:type="enumeration" d:values="OpenAccount CloseAccount Trade">
+				<b:FieldInfo/>
+			</ElementType></Schema>
+	</SrcTree><TrgTree><Schema name="FundInvestorsSummary" b:BizTalkServerEditorTool_Version="1.5" b:root_reference="FundInvestorsSummary" b:standard="XML" xmlns="urn:schemas-microsoft-com:xml-data" xmlns:b="urn:schemas-microsoft-com:BizTalkServer" xmlns:d="urn:schemas-microsoft-com:datatypes">
+			<b:SelectionFields/>
+			<ElementType name="TotalTransaction" content="textOnly" model="closed">
+				<b:FieldInfo/>
+			</ElementType><ElementType name="FundInvestorsSummary" content="eltOnly" model="closed">
+				<b:RecordInfo/>
+				<element type="FundCompany" maxOccurs="1" minOccurs="0"/>
+				<element type="TotalTransaction" maxOccurs="1" minOccurs="0"/>
+			</ElementType><ElementType name="FundCompany" content="textOnly" model="closed">
+				<b:FieldInfo/>
+			</ElementType></Schema>
+	</TrgTree><TreeValues/><Pages><Page Name="Page 1"><Links><Link LinkID="1" LinkFrom="/FundInvestors/FundCompany" LinkTo="/FundInvestorsSummary/FundCompany"/><Link LinkID="2" LinkFrom="/FundInvestors/Investors/Investor/Funds/Fund/@quantity" LinkTo="1"/><Link LinkID="3" LinkFrom="/FundInvestors/Investors/Investor/Funds/Fund/@price" LinkTo="1"/><Link LinkID="4" LinkFrom="1" LinkTo="2"/><Link LinkID="5" LinkFrom="2" LinkTo="/FundInvestorsSummary/TotalTransaction"/></Links><Functoids><Functoid FunctoidID="1" X-Cell="52" Y-Cell="222" Functoid-FID="120" Functoid-Version="1" Script-Functoid="no"><Input-Parameters><Parameter Type="Link" Value="2"/><Parameter Type="Link" Value="3"/></Input-Parameters></Functoid><Functoid FunctoidID="2" X-Cell="55" Y-Cell="222" Functoid-FID="324" Functoid-Version="1" Script-Functoid="no"><Input-Parameters><Parameter Type="Link" Value="4"/></Input-Parameters></Functoid></Functoids></Page></Pages><CompiledXSL><xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:msxsl="urn:schemas-microsoft-com:xslt" xmlns:var="urn:var" xmlns:userVBScript="urn:userVBScript" xmlns:userJScript="urn:userJScript" exclude-result-prefixes="msxsl var userVBScript userJScript" version="1.0">
+			<xsl:output method="xml" omit-xml-declaration="yes"/>
+			<xsl:template match="/">
+				<xsl:apply-templates select="FundInvestors"/>
+			</xsl:template>
+			<xsl:template match="FundInvestors">
+				<FundInvestorsSummary>
+					<FundCompany><xsl:value-of select="FundCompany/text()"/></FundCompany>
+					<xsl:variable name="var:v1" select="userVBScript:FctInitCumulativeSum(0)"/>
+					<xsl:for-each select="/FundInvestors/Investors/Investor/Funds/Fund">
+						<xsl:variable name="var:v2" select="userVBScript:fctmathmultiply2(string(@quantity),string(@price))"/>
+						<xsl:variable name="var:v3" select="userVBScript:FctAddToCumulativeSum(0,string($var:v2),&quot;1000&quot;)"/>
+					</xsl:for-each>
+					<xsl:variable name="var:v4" select="userVBScript:FctGetCumulativeSum(0)"/>
+					<TotalTransaction><xsl:value-of select="$var:v4"/></TotalTransaction>
+				</FundInvestorsSummary>
+			</xsl:template>
+			<msxsl:script language="VBScript" implements-prefix="userVBScript">
+				<![CDATA[
+Function FctMathMultiply2( p_strParm0, p_strParm1 )
+  If (  IsNumeric( p_strParm0 ) And  IsNumeric( p_strParm1 ) ) Then
+  FctMathMultiply2 = CDbl( p_strParm0 ) * CDbl( p_strParm1 )
+  Else
+    FctMathMultiply2 = ""
+  End If
+End Function
+
+Dim ArrCumulativeSum()
+Dim CumSumArrayLength
+
+CumSumArrayLength = 0
+
+Function FctGetCumulativeSum( Index )
+    FctGetCumulativeSum = ArrCumulativeSum( Index )
+End Function
+
+Function FctInitCumulativeSum( Index )
+    If CumSumArrayLength <= Index Then
+      CumSumArrayLength = CumSumArrayLength + 1
+      Redim Preserve ArrCumulativeSum( CumSumArrayLength )
+    End If
+    ArrCumulativeSum( Index ) = ""
+    FctInitCumulativeSum = ""
+End Function
+
+Function FctAddToCumulativeSum( Index, Value, NotUsed )
+    If IsNumeric( Value ) Then
+        If ArrCumulativeSum( Index ) = "" Then
+            ArrCumulativeSum( Index ) = CDbl( Value )
+        Else
+            ArrCumulativeSum( Index ) = ArrCumulativeSum( Index ) + CDbl( Value )
+        End If
+    End If
+    FctAddToCumulativeSum = ArrCumulativeSum( Index )
+End Function
+
+]]>
+			</msxsl:script>
+		</xsl:stylesheet>
+	</CompiledXSL></mapsource>

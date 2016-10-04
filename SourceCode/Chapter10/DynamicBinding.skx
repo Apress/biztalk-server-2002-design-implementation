@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+<!--
+    File created by XLANG Scheduler Engine version 1.0
+    at Sun Sep 08 19:28:25 2002
+
+    '===========================
+    ' Starting the XLANG schedule
+    Set oSked = GetObject("sked://localhost/C:\Apress-PostEdit\SourceCode\Chapter10\DynamicBinding.skx")
+    sName = oSked.FullyQualifiedName
+
+    '===========================
+    ' Getting proxy for COM port
+    ' Set oPort = oSked.Port("yourPortNameBoundToCOM")
+    ' Call oPort.yourMethod(args ...)
+ 
+
+    '===========================
+    ' Get full queue name (MSMQ port)
+    ' or moniker (COM port)
+    ' sName = oSked.FullPortName("yourPortName")
+-->
+<module xmlns="urn:schemas-microsoft-com:scheduler" xmlns:com="urn:schemas-microsoft-com:comscheduler" xmlns:msmq="urn:schemas-microsoft-com:msmqscheduler">
+	<module name="DynamicBinding" identity="69DD0DD8-63DF-4932-AB7B-FD771B6F38CF">
+		<schedule>
+			<header>
+				<portList>
+					<port tag="0!16" name="ReceiveDoc"/>
+					<port tag="0!28" name="DynamicPort"/>
+				</portList>
+				<messageList>
+					<message tag="4!3" name="Constants"/>
+					<message tag="4!17" name="DynamicBindingMSG"/>
+					<message tag="4!36" name="OutgoingMSG"/>
+				</messageList>
+				<ruleList/>
+				<contextParameterList/>
+			</header>
+			<map>
+				<sequence tag="0!6">
+					<block>
+						<sink tag="0!5" comment="ReceiveDocument">
+							<portRef location="ReceiveDoc"/>
+							<messageRef location="DynamicBindingMSG"/>
+						</sink>
+						<source tag="0!6" comment="SendDocument">
+							<portRef location="DynamicPort"/>
+							<messageRef location="OutgoingMSG"/>
+						</source>
+					</block>
+					<zero tag="0!7"/>
+				</sequence>
+				<assignmentList>
+					<assignment>
+						<messageRef location="DynamicBindingMSG"/>
+						<portRef location="DynamicPort"/>
+					</assignment>
+				</assignmentList>
+			</map>
+		</schedule>
+		<binding>
+			<moduleRef location="ancestor::*[local-name()='module' and *[local-name()='schedule']]"/>
+			<translationHeaderList>
+				<translationHeader>
+					<com:header txnsupport="DISABLED"/>
+				</translationHeader>
+				<translationHeader>
+					<msmq:header/>
+				</translationHeader>
+			</translationHeaderList>
+			<schemaList>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Constants">
+					<ElementType name="ElementType_Constants">
+						<element type="__Instance_Id__"/>
+					</ElementType>
+					<ElementType name="__Instance_Id__" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_DynamicBindingMSG">
+					<ElementType name="ElementType_DynamicBindingMSG">
+						<element type="Document"/>
+						<element type="Address"/>
+					</ElementType>
+					<ElementType name="Document" dt:type="string"/>
+					<ElementType name="Address" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_OutgoingMSG">
+					<ElementType name="ElementType_OutgoingMSG">
+						<element type="Document"/>
+					</ElementType>
+					<ElementType name="Document" dt:type="string"/>
+				</Schema>
+			</schemaList>
+			<messageDeclList>
+				<messageDecl>
+					<messageRef location="Constants"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Constants']/*[local-name()='ElementType' and @name='ElementType_Constants']"/>
+					<ElementType_Constants xmlns="x-schema:#Schema_Constants" xmlns:sched="urn:schemas-microsoft-com:scheduler">
+						<__Instance_Id__ sched:tag="4!9">__Instance_Id__</__Instance_Id__>
+					</ElementType_Constants>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="DynamicBindingMSG"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_DynamicBindingMSG']/*[local-name()='ElementType' and @name='ElementType_DynamicBindingMSG']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="OutgoingMSG"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_OutgoingMSG']/*[local-name()='ElementType' and @name='ElementType_OutgoingMSG']"/>
+				</messageDecl>
+			</messageDeclList>
+			<portBindingList>
+				<portBinding tag="0!16">
+					<portRef location="ReceiveDoc"/>
+					<portTranslation>
+						<msmq:queue tag="0!11" queueName="bts://&amp;Port_1&amp;.\private$\Port_1" wellKnown="0" queueInfoClsid="27f4275d-707c-4047-a77b-56a5d0eb034f" messageClsid="167c7c8e-8300-434c-90f1-d35bb39538fd"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!19">
+							<messageRef location="DynamicBindingMSG"/>
+							<messageTranslation>
+								<msmq:message messageType="DynamicBinding"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!24">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!24"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!28">
+									<fieldRef location="Address"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!28" xPath="/DynamicBinding/Address"/>
+									</fieldTranslation>
+									<portRef location="DynamicPort"/>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="0!28">
+					<portRef location="DynamicPort"/>
+					<portTranslation>
+						<msmq:queue tag="0!22"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!31">
+							<messageRef location="OutgoingMSG"/>
+							<messageTranslation>
+								<msmq:message messageType="OutgoingMSG"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!43">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!43"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="DynamicBindingMSG"/>
+										<fieldRef location="Document"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+			</portBindingList>
+			<contextBindingList/>
+			<ruleBindingList/>
+			<callBindingList/>
+		</binding>
+	</module>
+</module>

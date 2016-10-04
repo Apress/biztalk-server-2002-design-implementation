@@ -1,0 +1,37 @@
+Type=Exe
+Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\WINNT\System32\STDOLE2.TLB#OLE Automation
+Reference=*\G{7D2A8C7C-645C-11D2-B605-00C04FC30E1A}#1.0#0#..\..\..\Program Files\Microsoft BizTalk Server\cisapi.tlb#Microsoft BizTalk Server Interchange 1.0 Type Library
+Object={00028C01-0000-0000-0000-000000000046}#1.0#0; DBGRID32.OCX
+Object={F0D2F211-CCB0-11D0-A316-00AA00688B10}#1.0#0; MSDATLST.OCX
+Form=Form1.frm
+Object={3B7C8863-D78F-101B-B9B5-04021C009402}#1.2#0; richtx32.ocx
+Startup="SuspendDocTool"
+ExeName32="SuspendDocTool.exe"
+Command32=""
+Name="SuspendedDocViewer"
+HelpContextID="0"
+CompatibleMode="0"
+MajorVer=1
+MinorVer=0
+RevisionVer=0
+AutoIncrementVer=0
+ServerSupportFiles=0
+VersionCompanyName="none"
+CompilationType=0
+OptimizationType=0
+FavorPentiumPro(tm)=0
+CodeViewDebugInfo=0
+NoAliasing=0
+BoundsCheck=0
+OverflowCheck=0
+FlPointCheck=0
+FDIVCheck=0
+UnroundedFP=0
+StartMode=0
+Unattended=0
+Retained=0
+ThreadPerObject=0
+MaxNumberOfThreads=1
+
+[MS Transaction Server]
+AutoRefresh=1

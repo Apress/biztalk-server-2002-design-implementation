@@ -1,0 +1,331 @@
+<?xml version="1.0"?>
+<!--
+    File created by XLANG Scheduler Engine version 1.0
+    at Sun Sep 08 21:46:59 2002
+
+    '===========================
+    ' Starting the XLANG schedule
+    Set oSked = GetObject("sked://localhost/C:\Apress-PostEdit\SourceCode\Chapter13\Easy.skx")
+    sName = oSked.FullyQualifiedName
+
+    '===========================
+    ' Getting proxy for COM port
+    ' Set oPort = oSked.Port("yourPortNameBoundToCOM")
+    ' Call oPort.yourMethod(args ...)
+ 
+
+    '===========================
+    ' Get full queue name (MSMQ port)
+    ' or moniker (COM port)
+    ' sName = oSked.FullPortName("yourPortName")
+-->
+<module xmlns="urn:schemas-microsoft-com:scheduler" xmlns:com="urn:schemas-microsoft-com:comscheduler" xmlns:msmq="urn:schemas-microsoft-com:msmqscheduler">
+	<module name="Easy" identity="37B0CF16-1219-43E5-8FF4-19F69CF6173B">
+		<schedule>
+			<header>
+				<portList>
+					<port tag="0!10" name="Receive"/>
+					<port tag="0!21" name="Proceses"/>
+					<port tag="0!30" name="Save"/>
+				</portList>
+				<messageList>
+					<message tag="4!3" name="Constants"/>
+					<message tag="4!17" name="app_in"/>
+					<message tag="4!17" name="app_out"/>
+					<message tag="4!44" name="ProcessTrade_in"/>
+					<message tag="4!44" name="ProcessTrade_out"/>
+					<message tag="4!71" name="WriteToFile_in"/>
+					<message tag="4!71" name="WriteToFile_out"/>
+				</messageList>
+				<ruleList/>
+				<contextParameterList/>
+			</header>
+			<sequence tag="0!27">
+				<block>
+					<synchronous tag="0!5" comment="Receive Doc">
+						<sink tag="0!5" comment="Receive Doc">
+							<portRef location="Receive"/>
+							<messageRef location="app_in"/>
+						</sink>
+						<source tag="0!5" comment="Receive Doc">
+							<portRef location="Receive"/>
+							<messageRef location="app_out"/>
+						</source>
+					</synchronous>
+					<synchronous tag="0!16" comment="Business Processes">
+						<source tag="0!16" comment="Business Processes">
+							<portRef location="Proceses"/>
+							<messageRef location="ProcessTrade_in"/>
+						</source>
+						<sink tag="0!16" comment="Business Processes">
+							<portRef location="Proceses"/>
+							<messageRef location="ProcessTrade_out"/>
+						</sink>
+					</synchronous>
+					<synchronous tag="0!27" comment="Save the Result">
+						<source tag="0!27" comment="Save the Result">
+							<portRef location="Save"/>
+							<messageRef location="WriteToFile_in"/>
+						</source>
+						<sink tag="0!27" comment="Save the Result">
+							<portRef location="Save"/>
+							<messageRef location="WriteToFile_out"/>
+						</sink>
+					</synchronous>
+				</block>
+				<zero tag="0!36"/>
+			</sequence>
+		</schedule>
+		<binding>
+			<moduleRef location="ancestor::*[local-name()='module' and *[local-name()='schedule']]"/>
+			<translationHeaderList>
+				<translationHeader>
+					<com:header txnsupport="DISABLED"/>
+				</translationHeader>
+				<translationHeader>
+					<msmq:header/>
+				</translationHeader>
+			</translationHeaderList>
+			<schemaList>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Constants">
+					<ElementType name="ElementType_Constants">
+						<element type="__Instance_Id__"/>
+					</ElementType>
+					<ElementType name="__Instance_Id__" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_app_in">
+					<ElementType name="ElementType_app_in">
+						<element type="x"/>
+					</ElementType>
+					<ElementType name="x" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_app_out">
+					<ElementType name="ElementType_app_out">
+						<element type="x"/>
+						<element type="app"/>
+					</ElementType>
+					<ElementType name="x" dt:type="string"/>
+					<ElementType name="app" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_ProcessTrade_in">
+					<ElementType name="ElementType_ProcessTrade_in">
+						<element type="doc"/>
+					</ElementType>
+					<ElementType name="doc" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_ProcessTrade_out">
+					<ElementType name="ElementType_ProcessTrade_out">
+						<element type="doc"/>
+						<element type="ProcessTrade"/>
+					</ElementType>
+					<ElementType name="doc" dt:type="string"/>
+					<ElementType name="ProcessTrade" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_WriteToFile_in">
+					<ElementType name="ElementType_WriteToFile_in">
+						<element type="Document"/>
+						<element type="FileName"/>
+					</ElementType>
+					<ElementType name="Document">
+						<element type="com:variant"/>
+					</ElementType>
+					<ElementType name="FileName">
+						<element type="com:variant"/>
+					</ElementType>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_WriteToFile_out">
+					<ElementType name="ElementType_WriteToFile_out">
+						<element type="Document"/>
+						<element type="FileName"/>
+						<element type="WriteToFile"/>
+					</ElementType>
+					<ElementType name="Document">
+						<element type="com:variant"/>
+					</ElementType>
+					<ElementType name="FileName">
+						<element type="com:variant"/>
+					</ElementType>
+					<ElementType name="WriteToFile">
+						<element type="com:variant"/>
+					</ElementType>
+				</Schema>
+			</schemaList>
+			<messageDeclList>
+				<messageDecl>
+					<messageRef location="Constants"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Constants']/*[local-name()='ElementType' and @name='ElementType_Constants']"/>
+					<ElementType_Constants xmlns="x-schema:#Schema_Constants" xmlns:sched="urn:schemas-microsoft-com:scheduler">
+						<__Instance_Id__ sched:tag="4!9">__Instance_Id__</__Instance_Id__>
+					</ElementType_Constants>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="app_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_app_in']/*[local-name()='ElementType' and @name='ElementType_app_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="app_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_app_out']/*[local-name()='ElementType' and @name='ElementType_app_out']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="ProcessTrade_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_ProcessTrade_in']/*[local-name()='ElementType' and @name='ElementType_ProcessTrade_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="ProcessTrade_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_ProcessTrade_out']/*[local-name()='ElementType' and @name='ElementType_ProcessTrade_out']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="WriteToFile_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_WriteToFile_in']/*[local-name()='ElementType' and @name='ElementType_WriteToFile_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="WriteToFile_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_WriteToFile_out']/*[local-name()='ElementType' and @name='ElementType_WriteToFile_out']"/>
+				</messageDecl>
+			</messageDeclList>
+			<portBindingList>
+				<portBinding tag="0!10">
+					<portRef location="Receive"/>
+					<portTranslation>
+						<com:interface tag="0!6" iid="d09cca1a-fd6a-466f-95c6-b6f2d970015e" noInvocation="1"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!13">
+							<messageRef location="app_in"/>
+							<messageTranslation>
+								<com:method tag="0!12" name="app" slot="7" dispid="1610809344" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!24">
+									<fieldRef location="x"/>
+									<fieldTranslation>
+										<com:parameter tag="4!24" name="x" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding tag="0!14">
+							<messageRef location="app_out"/>
+							<messageTranslation>
+								<com:return tag="0!12" name="app" slot="7" dispid="1610809344" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!32">
+									<fieldRef location="x"/>
+									<fieldTranslation>
+										<com:parameter tag="4!32" name="x" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!36">
+									<fieldRef location="app"/>
+									<fieldTranslation>
+										<com:parameter tag="4!36" name="app" index="1" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="0!21">
+					<portRef location="Proceses"/>
+					<portTranslation>
+						<com:interface tag="0!17" iid="36443859-b565-43e2-8f4d-be9ebe6c5134" clsid="99c3b15b-0b9a-45e9-a076-a18c1293751d" txnsupport="NOT_SUPPORTED"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!24">
+							<messageRef location="ProcessTrade_in"/>
+							<messageTranslation>
+								<com:method tag="0!23" name="ProcessTrade" slot="7" dispid="1610809344" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!51">
+									<fieldRef location="doc"/>
+									<fieldTranslation>
+										<com:parameter tag="4!51" name="doc" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding tag="0!25">
+							<messageRef location="ProcessTrade_out"/>
+							<messageTranslation>
+								<com:return tag="0!23" name="ProcessTrade" slot="7" dispid="1610809344" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!59">
+									<fieldRef location="doc"/>
+									<fieldTranslation>
+										<com:parameter tag="4!59" name="doc" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!63">
+									<fieldRef location="ProcessTrade"/>
+									<fieldTranslation>
+										<com:parameter tag="4!63" name="ProcessTrade" index="1" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="0!30">
+					<portRef location="Save"/>
+					<portTranslation>
+						<com:interface tag="0!28" iid="00020400-0000-0000-c000-000000000046" moniker="script:c:\program files\microsoft biztalk server\xlang scheduler\porequestapproval.wsc"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!33">
+							<messageRef location="WriteToFile_in"/>
+							<messageTranslation>
+								<com:method tag="0!32" name="WriteToFile" dispid="3" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!78">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<com:parameter tag="4!78" name="Document" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!82">
+									<fieldRef location="FileName"/>
+									<fieldTranslation>
+										<com:parameter tag="4!82" name="FileName" index="1" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding tag="0!34">
+							<messageRef location="WriteToFile_out"/>
+							<messageTranslation>
+								<com:return tag="0!32" name="WriteToFile" dispid="3" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!90">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<com:parameter tag="4!90" name="Document" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!94">
+									<fieldRef location="FileName"/>
+									<fieldTranslation>
+										<com:parameter tag="4!94" name="FileName" index="1" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!98">
+									<fieldRef location="WriteToFile"/>
+									<fieldTranslation>
+										<com:parameter tag="4!98" name="WriteToFile" index="2" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+			</portBindingList>
+			<contextBindingList/>
+			<ruleBindingList/>
+			<callBindingList/>
+		</binding>
+	</module>
+</module>

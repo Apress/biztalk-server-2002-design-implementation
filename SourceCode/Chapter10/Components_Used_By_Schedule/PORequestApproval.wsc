@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<component>
+
+<?component error="true" debug="true"?>
+
+<registration
+	description="PORequestApproval"
+	progid="BTSTutorial.PORequestApproval"
+	version="1.00"
+	classid="{2938621b-40fc-48e2-827c-bed74e21a538}"
+>
+</registration>
+
+<public>
+	<method name="SendApproval">
+		<PARAMETER name="Document"/>
+	</method>
+	<method name="SendDenial">
+		<PARAMETER name="Document"/>
+	</method>
+	<method name="WriteToFile">
+		<PARAMETER name="Document"/>
+		<PARAMETER name="FileName"/>
+	</method>
+</public>
+
+<implements type="Behavior" id="Behavior"/>
+
+<script language="VBScript">
+<![CDATA[
+
+function SendApproval(Document)
+	MsgBox "Scheduler Engine Accepted document :" + vbcrlf + + vbcrlf + Document, 0, "Document Approval Received"
+end function
+
+function SendDenial(Document)
+	MsgBox "Scheduler Engine Denied document :" + vbcrlf + + vbcrlf + Document, 0, "Document Denied"
+end function
+
+function WriteToFile(Document, FileName)
+	dim objFileSys, strTimeNow
+	
+	if FileName = "" then
+		FileName = "c:\TutorialFiles\Buyer\POReq*.xml"
+	end if
+
+	'Generate a Unique Number used to generate unique files using a mask
+	strTimeNow = left(Replace(CStr(FormatDateTime(Now(), 3)),":",""), 6)
+	
+	'Create File System Object
+	Set objFileSys = CreateObject("Scripting.FileSystemObject")
+	
+	'Create the Specified file, write the document data and close
+	Set filestream = objFileSys.CreateTextFile(Replace(FileName, "*", strTimeNow), False)
+	filestream.writeline Document
+	filestream.close
+end function
+
+]]>
+</script>
+
+</component>

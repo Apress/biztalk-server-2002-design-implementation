@@ -1,0 +1,298 @@
+<?xml version="1.0"?>
+<!--
+    File created by XLANG Scheduler Engine version 1.0
+    at Sun Sep 08 21:59:30 2002
+
+    '===========================
+    ' Starting the XLANG schedule
+    Set oSked = GetObject("sked://localhost/C:\Apress-PostEdit\SourceCode\Chapter13\ErrorHandling.skx")
+    sName = oSked.FullyQualifiedName
+
+    '===========================
+    ' Getting proxy for COM port
+    ' Set oPort = oSked.Port("yourPortNameBoundToCOM")
+    ' Call oPort.yourMethod(args ...)
+ 
+
+    '===========================
+    ' Get full queue name (MSMQ port)
+    ' or moniker (COM port)
+    ' sName = oSked.FullPortName("yourPortName")
+-->
+<module xmlns="urn:schemas-microsoft-com:scheduler" xmlns:com="urn:schemas-microsoft-com:comscheduler" xmlns:msmq="urn:schemas-microsoft-com:msmqscheduler">
+	<module name="ErrorHandling" identity="B00ED0AA-4F6E-49C5-A5E0-C37D84BFCFA8">
+		<schedule>
+			<header>
+				<portList>
+					<port tag="0!34" name="SendDocument"/>
+					<port tag="0!13" name="ProcessDocument"/>
+					<port tag="5!26" name="ErrorQueue"/>
+				</portList>
+				<messageList>
+					<message tag="4!3" name="Constants"/>
+					<message tag="4!45" name="ResponseDocument"/>
+					<message tag="4!18" name="app_in"/>
+					<message tag="4!18" name="app_out"/>
+					<message tag="4!60" name="ErrorDocument"/>
+				</messageList>
+				<ruleList>
+					<rule tag="0!8" name="Error"/>
+				</ruleList>
+				<contextParameterList/>
+			</header>
+			<sequence tag="0!52">
+				<block>
+					<silence tag="0!52" comment="Transaction 1"/>
+				</block>
+				<sequence tag="0!55">
+					<block>
+						<context tag="0!52" name="Transaction_1">
+							<transaction/>
+							<catch>
+								<sequence tag="5!29">
+									<block>
+										<source tag="5!29" comment="Save Error Document">
+											<portRef location="ErrorQueue"/>
+											<messageRef location="ErrorDocument"/>
+										</source>
+									</block>
+									<zero tag="5!31"/>
+								</sequence>
+							</catch>
+						</context>
+						<synchronous tag="0!5" comment="Process Document">
+							<source tag="0!5" comment="Process Document">
+								<portRef location="ProcessDocument"/>
+								<messageRef location="app_in"/>
+							</source>
+							<sink tag="0!5" comment="Process Document">
+								<portRef location="ProcessDocument"/>
+								<messageRef location="app_out"/>
+							</sink>
+						</synchronous>
+					</block>
+					<switch tag="0!6">
+						<branch tag="0!8">
+							<case>
+								<ruleRef location="Error"/>
+							</case>
+							<sequence tag="0!21">
+								<block>
+									<source tag="0!21" comment="Save to Error Queue">
+										<portRef location="ErrorQueue"/>
+										<messageRef location="ErrorDocument"/>
+									</source>
+								</block>
+								<zero tag="0!27"/>
+							</sequence>
+						</branch>
+						<default>
+							<sequence tag="0!22">
+								<block>
+									<source tag="0!22" comment="Reply to Customer">
+										<portRef location="SendDocument"/>
+										<messageRef location="ResponseDocument"/>
+									</source>
+								</block>
+								<zero tag="0!25"/>
+							</sequence>
+						</default>
+					</switch>
+				</sequence>
+			</sequence>
+		</schedule>
+		<binding>
+			<moduleRef location="ancestor::*[local-name()='module' and *[local-name()='schedule']]"/>
+			<translationHeaderList>
+				<translationHeader>
+					<com:header txnsupport="DISABLED"/>
+				</translationHeader>
+				<translationHeader>
+					<msmq:header/>
+				</translationHeader>
+			</translationHeaderList>
+			<schemaList>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Constants">
+					<ElementType name="ElementType_Constants">
+						<element type="__Instance_Id__"/>
+						<element type="Constant_1"/>
+					</ElementType>
+					<ElementType name="__Instance_Id__" dt:type="string"/>
+					<ElementType name="Constant_1" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_app_in">
+					<ElementType name="ElementType_app_in">
+						<element type="x"/>
+					</ElementType>
+					<ElementType name="x" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_app_out">
+					<ElementType name="ElementType_app_out">
+						<element type="x"/>
+						<element type="app"/>
+					</ElementType>
+					<ElementType name="x" dt:type="string"/>
+					<ElementType name="app" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema___MESSAGE1">
+					<ElementType name="ElementType___MESSAGE1"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_ErrorDocument">
+					<ElementType name="ElementType_ErrorDocument">
+						<element type="Document"/>
+					</ElementType>
+					<ElementType name="Document" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_ResponseDocument">
+					<ElementType name="ElementType_ResponseDocument">
+						<element type="Document"/>
+					</ElementType>
+					<ElementType name="Document" dt:type="string"/>
+				</Schema>
+			</schemaList>
+			<messageDeclList>
+				<messageDecl>
+					<messageRef location="Constants"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Constants']/*[local-name()='ElementType' and @name='ElementType_Constants']"/>
+					<ElementType_Constants xmlns="x-schema:#Schema_Constants" xmlns:sched="urn:schemas-microsoft-com:scheduler">
+						<__Instance_Id__ sched:tag="4!9">__Instance_Id__</__Instance_Id__>
+						<Constant_1 sched:tag="4!72"></Constant_1>
+					</ElementType_Constants>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="app_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_app_in']/*[local-name()='ElementType' and @name='ElementType_app_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="app_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_app_out']/*[local-name()='ElementType' and @name='ElementType_app_out']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="ErrorDocument"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_ErrorDocument']/*[local-name()='ElementType' and @name='ElementType_ErrorDocument']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="ResponseDocument"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_ResponseDocument']/*[local-name()='ElementType' and @name='ElementType_ResponseDocument']"/>
+				</messageDecl>
+			</messageDeclList>
+			<portBindingList>
+				<portBinding tag="0!13">
+					<portRef location="ProcessDocument"/>
+					<portTranslation>
+						<com:interface tag="0!9" iid="d09cca1a-fd6a-466f-95c6-b6f2d970015e" clsid="e4456f83-f7dc-487b-a3ef-0595681dc529"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!16">
+							<messageRef location="app_in"/>
+							<messageTranslation>
+								<com:method tag="0!15" name="app" slot="7" dispid="1610809344" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!25">
+									<fieldRef location="x"/>
+									<fieldTranslation>
+										<com:parameter tag="4!25" name="x" byRef="1"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="Constants"/>
+										<fieldRef location="Constant_1"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding tag="0!17">
+							<messageRef location="app_out"/>
+							<messageTranslation>
+								<com:return tag="0!15" name="app" slot="7" dispid="1610809344" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!33">
+									<fieldRef location="x"/>
+									<fieldTranslation>
+										<com:parameter tag="4!33" name="x" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!37">
+									<fieldRef location="app"/>
+									<fieldTranslation>
+										<com:parameter tag="4!37" name="app" index="1" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="5!26">
+					<portRef location="ErrorQueue"/>
+					<portTranslation>
+						<msmq:queue tag="5!20" queueName=".\private$\ErrorQueue"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!49">
+							<messageRef location="ErrorDocument"/>
+							<messageTranslation>
+								<msmq:message messageType="__Instance_Id__" labelIsInstanceID="1"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!67">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!67"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="app_out"/>
+										<fieldRef location="x"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="0!34">
+					<portRef location="SendDocument"/>
+					<portTranslation>
+						<msmq:queue tag="0!29" queueName="bts://&amp;C_SendToCustomer" wellKnown="1" queueInfoClsid="27f4275d-707c-4047-a77b-56a5d0eb034f" messageClsid="167c7c8e-8300-434c-90f1-d35bb39538fd"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!37">
+							<messageRef location="ResponseDocument"/>
+							<messageTranslation>
+								<msmq:message messageType="x"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!52">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!52"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="app_out"/>
+										<fieldRef location="x"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+			</portBindingList>
+			<contextBindingList>
+				<contextBinding>
+					<contextRef location="Transaction_1"/>
+					<retry>3</retry>
+					<backoff>20</backoff>
+					<timeout>60</timeout>
+				</contextBinding>
+			</contextBindingList>
+			<ruleBindingList>
+				<ruleBinding tag="0!8">
+					<ruleRef location="Error"/>
+					<ruleTranslation>
+						<scriptable tag="0!8" expression="1=1"/>
+					</ruleTranslation>
+				</ruleBinding>
+			</ruleBindingList>
+			<callBindingList/>
+		</binding>
+	</module>
+</module>

@@ -1,0 +1,508 @@
+<?xml version="1.0"?>
+<!--
+    File created by XLANG Scheduler Engine version 1.0
+    at Tue Jan 01 15:36:17 2002
+
+    '===========================
+    ' Starting the XLANG schedule
+    Set oSked = GetObject("sked://localhost/C:\Apress\Code\loop.skx")
+    sName = oSked.FullyQualifiedName
+
+    '===========================
+    ' Getting proxy for COM port
+    ' Set oPort = oSked.Port("yourPortNameBoundToCOM")
+    ' Call oPort.yourMethod(args ...)
+ 
+
+    '===========================
+    ' Get full queue name (MSMQ port)
+    ' or moniker (COM port)
+    ' sName = oSked.FullPortName("yourPortName")
+-->
+<module xmlns="urn:schemas-microsoft-com:scheduler" xmlns:com="urn:schemas-microsoft-com:comscheduler" xmlns:msmq="urn:schemas-microsoft-com:msmqscheduler">
+	<module name="__LoopModule" identity="BAD08E4E-D382-400F-941F-1C2FB8667530">
+		<schedule>
+			<header>
+				<portList>
+					<port tag="0!15" name="Port_1"/>
+					<port name="__PORT2"/>
+				</portList>
+				<messageList>
+					<message tag="4!3" name="Constants"/>
+					<message tag="4!18" name="Increment_in"/>
+					<message tag="4!18" name="Increment_out"/>
+					<message name="__MESSAGE1"/>
+					<message tag="4!33" name="DoWork_in"/>
+					<message tag="4!33" name="DoWork_out"/>
+				</messageList>
+				<ruleList>
+					<rule tag="0!17" name="Repeat"/>
+				</ruleList>
+				<contextParameterList/>
+			</header>
+			<map>
+				<switch tag="0!5">
+					<branch tag="0!17">
+						<case>
+							<ruleRef location="Repeat"/>
+							<messageRef location="Constants"/>
+							<messageRef location="Increment_out"/>
+						</case>
+						<sequence tag="0!10">
+							<block>
+								<synchronous tag="0!18" comment="DoWork">
+									<source tag="0!18" comment="DoWork">
+										<portRef location="Port_1"/>
+										<messageRef location="DoWork_in"/>
+									</source>
+									<sink tag="0!18" comment="DoWork">
+										<portRef location="Port_1"/>
+										<messageRef location="DoWork_out"/>
+									</sink>
+								</synchronous>
+								<synchronous tag="0!10" comment="Increment">
+									<source tag="0!10" comment="Increment">
+										<portRef location="Port_1"/>
+										<messageRef location="Increment_in"/>
+									</source>
+									<sink tag="0!10" comment="Increment">
+										<portRef location="Port_1"/>
+										<messageRef location="Increment_out"/>
+									</sink>
+								</synchronous>
+							</block>
+							<call tag="0!26">
+								<moduleRef location="//*[local-name()='module' and @name='__LoopModule' and @identity='BAD08E4E-D382-400F-941F-1C2FB8667530']"/>
+								<portRef location="Port_1"/>
+								<portRef location="__PORT2"/>
+								<messageRef location="Constants"/>
+								<messageRef location="Increment_in"/>
+								<messageRef location="Increment_out"/>
+								<messageRef location="__MESSAGE1"/>
+							</call>
+						</sequence>
+					</branch>
+					<default>
+						<sequence>
+							<block>
+								<source tag="0!5">
+									<portRef location="__PORT2"/>
+									<messageRef location="Increment_in"/>
+								</source>
+								<source tag="0!5">
+									<portRef location="__PORT2"/>
+									<messageRef location="Increment_out"/>
+								</source>
+								<source tag="0!5">
+									<portRef location="__PORT2"/>
+									<messageRef location="__MESSAGE1"/>
+								</source>
+							</block>
+						</sequence>
+					</default>
+				</switch>
+				<assignmentList>
+					<assignment>
+						<messageRef location="__MESSAGE1"/>
+						<portRef location="Port_1"/>
+					</assignment>
+				</assignmentList>
+			</map>
+		</schedule>
+		<binding>
+			<moduleRef location="ancestor::*[local-name()='module' and *[local-name()='schedule']]"/>
+			<translationHeaderList>
+				<translationHeader>
+					<com:header txnsupport="DISABLED"/>
+				</translationHeader>
+				<translationHeader>
+					<msmq:header/>
+				</translationHeader>
+			</translationHeaderList>
+			<schemaList>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Constants">
+					<ElementType name="ElementType_Constants">
+						<element type="__Instance_Id__"/>
+						<element type="repeat"/>
+					</ElementType>
+					<ElementType name="__Instance_Id__" dt:type="string"/>
+					<ElementType name="repeat" dt:type="i2"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Increment_in">
+					<ElementType name="ElementType_Increment_in"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Increment_out">
+					<ElementType name="ElementType_Increment_out">
+						<element type="Increment"/>
+					</ElementType>
+					<ElementType name="Increment">
+						<element type="com:variant"/>
+					</ElementType>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_DoWork_in">
+					<ElementType name="ElementType_DoWork_in"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_DoWork_out">
+					<ElementType name="ElementType_DoWork_out">
+						<element type="DoWork"/>
+					</ElementType>
+					<ElementType name="DoWork">
+						<element type="com:variant"/>
+					</ElementType>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema___MESSAGE1">
+					<ElementType name="ElementType___MESSAGE1">
+						<element type="Port_1"/>
+					</ElementType>
+					<ElementType name="Port_1">
+						<element type="com:unknown"/>
+					</ElementType>
+				</Schema>
+			</schemaList>
+			<messageDeclList>
+				<messageDecl>
+					<messageRef location="Constants"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Constants']/*[local-name()='ElementType' and @name='ElementType_Constants']"/>
+					<ElementType_Constants xmlns="x-schema:#Schema_Constants" xmlns:sched="urn:schemas-microsoft-com:scheduler">
+						<__Instance_Id__ sched:tag="4!9">__Instance_Id__</__Instance_Id__>
+						<repeat sched:tag="4!41">3</repeat>
+					</ElementType_Constants>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="Increment_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Increment_in']/*[local-name()='ElementType' and @name='ElementType_Increment_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="Increment_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Increment_out']/*[local-name()='ElementType' and @name='ElementType_Increment_out']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="DoWork_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_DoWork_in']/*[local-name()='ElementType' and @name='ElementType_DoWork_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="DoWork_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_DoWork_out']/*[local-name()='ElementType' and @name='ElementType_DoWork_out']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="__MESSAGE1"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema___MESSAGE1']/*[local-name()='ElementType' and @name='ElementType___MESSAGE1']"/>
+				</messageDecl>
+			</messageDeclList>
+			<portBindingList>
+				<portBinding tag="0!15">
+					<portRef location="Port_1"/>
+					<portTranslation>
+						<com:interface tag="0!11" iid="7d1211dd-53bc-49e9-9650-6215928a1d78" clsid="b99c3f91-e3bd-4652-bfe1-b1554a6e0afe" holdstate="1"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!22">
+							<messageRef location="Increment_in"/>
+							<messageTranslation>
+								<com:method tag="0!20" name="Increment" slot="7" dispid="1610809346" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList/>
+						</messageBinding>
+						<messageBinding tag="0!23">
+							<messageRef location="Increment_out"/>
+							<messageTranslation>
+								<com:return tag="0!20" name="Increment" slot="7" dispid="1610809346" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!29">
+									<fieldRef location="Increment"/>
+									<fieldTranslation>
+										<com:parameter tag="4!29" name="Increment" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding tag="0!28">
+							<messageRef location="DoWork_in"/>
+							<messageTranslation>
+								<com:method tag="0!21" name="DoWork" slot="8" dispid="1610809347" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList/>
+						</messageBinding>
+						<messageBinding tag="0!29">
+							<messageRef location="DoWork_out"/>
+							<messageTranslation>
+								<com:return tag="0!21" name="DoWork" slot="8" dispid="1610809347" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!48">
+									<fieldRef location="DoWork"/>
+									<fieldTranslation>
+										<com:parameter tag="4!48" name="DoWork" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding>
+					<portRef location="__PORT2"/>
+					<messageBindingList>
+						<messageBinding tag="0!22">
+							<messageRef location="Increment_in"/>
+							<fieldBindingList/>
+						</messageBinding>
+						<messageBinding tag="0!23">
+							<messageRef location="Increment_out"/>
+							<fieldBindingList>
+								<fieldBinding tag="4!29">
+									<fieldRef location="Increment"/>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding>
+							<messageRef location="__MESSAGE1"/>
+							<fieldBindingList>
+								<fieldBinding>
+									<fieldRef location="Port_1"/>
+									<portRef location="Port_1"/>
+									<raw/>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+			</portBindingList>
+			<contextBindingList/>
+			<ruleBindingList>
+				<ruleBinding tag="0!17">
+					<ruleRef location="Repeat"/>
+					<ruleTranslation>
+						<scriptable tag="0!17" expression="Increment_out.Increment &lt;= Constants.repeat"/>
+					</ruleTranslation>
+				</ruleBinding>
+			</ruleBindingList>
+			<callBindingList/>
+		</binding>
+	</module>
+	<module name="loop" identity="5367BDB1-84FB-43A8-AFB0-686189E06012">
+		<schedule>
+			<header>
+				<portList>
+					<port tag="0!15" name="Port_1"/>
+					<port name="__PORT1"/>
+					<port name="__PORT2"/>
+				</portList>
+				<messageList>
+					<message tag="4!3" name="Constants"/>
+					<message tag="4!18" name="Increment_in"/>
+					<message tag="4!18" name="Increment_out"/>
+					<message name="__MESSAGE1"/>
+				</messageList>
+				<ruleList/>
+				<contextParameterList/>
+			</header>
+			<map>
+				<sequence tag="0!8">
+					<block>
+						<synchronous tag="0!8" comment="initialize">
+							<source tag="0!8" comment="initialize">
+								<portRef location="Port_1"/>
+								<messageRef location="Increment_in"/>
+							</source>
+							<sink tag="0!8" comment="initialize">
+								<portRef location="Port_1"/>
+								<messageRef location="Increment_out"/>
+							</sink>
+						</synchronous>
+					</block>
+					<connect tag="0!5" sharedNames="1">
+						<sequence>
+							<block>
+								<sink tag="0!5">
+									<portRef location="__PORT1"/>
+									<messageRef location="Increment_in"/>
+								</sink>
+								<sink tag="0!5">
+									<portRef location="__PORT1"/>
+									<messageRef location="Increment_out"/>
+								</sink>
+								<sink tag="0!5">
+									<portRef location="__PORT1"/>
+									<messageRef location="__MESSAGE1"/>
+								</sink>
+							</block>
+							<zero tag="0!7"/>
+						</sequence>
+						<call>
+							<moduleRef location="//*[local-name()='module' and @name='__LoopModule' and @identity='BAD08E4E-D382-400F-941F-1C2FB8667530']"/>
+							<portRef location="Port_1"/>
+							<portRef location="__PORT2"/>
+							<messageRef location="Constants"/>
+							<messageRef location="Increment_in"/>
+							<messageRef location="Increment_out"/>
+							<messageRef location="__MESSAGE1"/>
+						</call>
+						<connectionList>
+							<connection>
+								<portRef location="__PORT2"/>
+								<portRef location="__PORT1"/>
+							</connection>
+						</connectionList>
+					</connect>
+				</sequence>
+				<assignmentList>
+					<assignment>
+						<messageRef location="__MESSAGE1"/>
+						<portRef location="Port_1"/>
+					</assignment>
+				</assignmentList>
+			</map>
+		</schedule>
+		<binding>
+			<moduleRef location="ancestor::*[local-name()='module' and *[local-name()='schedule']]"/>
+			<translationHeaderList>
+				<translationHeader>
+					<com:header txnsupport="DISABLED"/>
+				</translationHeader>
+				<translationHeader>
+					<msmq:header/>
+				</translationHeader>
+			</translationHeaderList>
+			<schemaList>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Constants">
+					<ElementType name="ElementType_Constants">
+						<element type="__Instance_Id__"/>
+						<element type="repeat"/>
+					</ElementType>
+					<ElementType name="__Instance_Id__" dt:type="string"/>
+					<ElementType name="repeat" dt:type="i2"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Increment_in">
+					<ElementType name="ElementType_Increment_in"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Increment_out">
+					<ElementType name="ElementType_Increment_out">
+						<element type="Increment"/>
+					</ElementType>
+					<ElementType name="Increment">
+						<element type="com:variant"/>
+					</ElementType>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema___MESSAGE1">
+					<ElementType name="ElementType___MESSAGE1">
+						<element type="Port_1"/>
+					</ElementType>
+					<ElementType name="Port_1">
+						<element type="com:unknown"/>
+					</ElementType>
+				</Schema>
+			</schemaList>
+			<messageDeclList>
+				<messageDecl>
+					<messageRef location="Constants"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Constants']/*[local-name()='ElementType' and @name='ElementType_Constants']"/>
+					<ElementType_Constants xmlns="x-schema:#Schema_Constants" xmlns:sched="urn:schemas-microsoft-com:scheduler">
+						<__Instance_Id__ sched:tag="4!9">__Instance_Id__</__Instance_Id__>
+						<repeat sched:tag="4!41">3</repeat>
+					</ElementType_Constants>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="Increment_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Increment_in']/*[local-name()='ElementType' and @name='ElementType_Increment_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="Increment_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Increment_out']/*[local-name()='ElementType' and @name='ElementType_Increment_out']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="__MESSAGE1"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema___MESSAGE1']/*[local-name()='ElementType' and @name='ElementType___MESSAGE1']"/>
+				</messageDecl>
+			</messageDeclList>
+			<portBindingList>
+				<portBinding tag="0!15">
+					<portRef location="Port_1"/>
+					<portTranslation>
+						<com:interface tag="0!11" iid="7d1211dd-53bc-49e9-9650-6215928a1d78" clsid="b99c3f91-e3bd-4652-bfe1-b1554a6e0afe" holdstate="1"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!22">
+							<messageRef location="Increment_in"/>
+							<messageTranslation>
+								<com:method tag="0!20" name="Increment" slot="7" dispid="1610809346" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList/>
+						</messageBinding>
+						<messageBinding tag="0!23">
+							<messageRef location="Increment_out"/>
+							<messageTranslation>
+								<com:return tag="0!20" name="Increment" slot="7" dispid="1610809346" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!29">
+									<fieldRef location="Increment"/>
+									<fieldTranslation>
+										<com:parameter tag="4!29" name="Increment" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding>
+					<portRef location="__PORT1"/>
+					<messageBindingList>
+						<messageBinding tag="0!22">
+							<messageRef location="Increment_in"/>
+							<fieldBindingList/>
+						</messageBinding>
+						<messageBinding tag="0!23">
+							<messageRef location="Increment_out"/>
+							<fieldBindingList>
+								<fieldBinding tag="4!29">
+									<fieldRef location="Increment"/>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding>
+							<messageRef location="__MESSAGE1"/>
+							<fieldBindingList>
+								<fieldBinding>
+									<fieldRef location="Port_1"/>
+									<portRef location="Port_1"/>
+									<raw/>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding>
+					<portRef location="__PORT2"/>
+					<messageBindingList>
+						<messageBinding tag="0!22">
+							<messageRef location="Increment_in"/>
+							<fieldBindingList/>
+						</messageBinding>
+						<messageBinding tag="0!23">
+							<messageRef location="Increment_out"/>
+							<fieldBindingList>
+								<fieldBinding tag="4!29">
+									<fieldRef location="Increment"/>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding>
+							<messageRef location="__MESSAGE1"/>
+							<fieldBindingList>
+								<fieldBinding>
+									<fieldRef location="Port_1"/>
+									<portRef location="Port_1"/>
+									<raw/>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+			</portBindingList>
+			<contextBindingList/>
+			<ruleBindingList/>
+			<callBindingList/>
+		</binding>
+	</module>
+</module>

@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+<!-- Generated using BizTalk Mapper on Sun, Sep 08 2002 06:35:15 PM -->
+<!-- Copyright (c) Microsoft Corporation. All rights reserved. -->
+<mapsource Name="BizTalk Map" BizTalkServerMapperTool_Version="1.5" Version="1.5" XRange="100" YRange="420"><SrcTree><Schema name="FundInvestorsDatabase" b:BizTalkServerEditorTool_Version="1.5" b:root_reference="FundInvestorsDatabase" b:standard="XML" xmlns="urn:schemas-microsoft-com:xml-data" xmlns:b="urn:schemas-microsoft-com:BizTalkServer" xmlns:d="urn:schemas-microsoft-com:datatypes">
+			<b:SelectionFields/>
+			<ElementType name="InvestorID" content="textOnly" model="closed">
+				<b:RecordInfo/>
+			</ElementType><ElementType name="FundInvestorsDatabase" content="eltOnly" model="closed">
+				<b:RecordInfo/>
+				<element type="FundCompany" maxOccurs="1" minOccurs="0"/>
+				<element type="InvestorID" maxOccurs="*" minOccurs="0"/>
+			</ElementType><ElementType name="FundCompany" content="textOnly" model="closed">
+				<b:FieldInfo/>
+			</ElementType></Schema>
+	</SrcTree><TrgTree><Schema name="FundInvestorsInfo" b:BizTalkServerEditorTool_Version="1.5" b:root_reference="FundInvestorsInfo" b:standard="XML" xmlns="urn:schemas-microsoft-com:xml-data" xmlns:b="urn:schemas-microsoft-com:BizTalkServer" xmlns:d="urn:schemas-microsoft-com:datatypes">
+			<b:SelectionFields/>
+			<ElementType name="Phone" content="textOnly" model="closed">
+				<b:FieldInfo/>
+			</ElementType><ElementType name="InvestorName" content="textOnly" model="closed">
+				<b:FieldInfo/>
+			</ElementType><ElementType name="Investor" content="eltOnly" model="closed">
+				<b:RecordInfo/>
+				<element type="InvestorName" maxOccurs="1" minOccurs="0"/>
+				<element type="Email" maxOccurs="1" minOccurs="0"/>
+				<element type="Phone" maxOccurs="1" minOccurs="0"/>
+				<element type="DatabasError" maxOccurs="1" minOccurs="0"/>
+			</ElementType><ElementType name="FundInvestorsInfo" content="eltOnly" model="closed">
+				<b:RecordInfo/>
+				<AttributeType name="FundCompany">
+					<b:FieldInfo/></AttributeType>
+				<attribute type="FundCompany" required="no"/>
+				<element type="Investor" maxOccurs="*" minOccurs="0"/>
+			</ElementType><ElementType name="Email" content="textOnly" model="closed">
+				<b:FieldInfo/>
+			</ElementType><ElementType name="DatabasError" content="textOnly" model="closed">
+				<b:FieldInfo/>
+			</ElementType></Schema>
+	</TrgTree><TreeValues/><Pages><Page Name="Page 1"><Links><Link LinkID="1" LinkFrom="/FundInvestorsDatabase/InvestorID" LinkTo="1"/><Link LinkID="2" LinkFrom="1" LinkTo="2"/><Link LinkID="3" LinkFrom="1" LinkTo="3"/><Link LinkID="4" LinkFrom="1" LinkTo="4"/><Link LinkID="5" LinkFrom="2" LinkTo="/FundInvestorsInfo/Investor/InvestorName"/><Link LinkID="6" LinkFrom="3" LinkTo="/FundInvestorsInfo/Investor/Email"/><Link LinkID="7" LinkFrom="1" LinkTo="5"/><Link LinkID="8" LinkFrom="4" LinkTo="/FundInvestorsInfo/Investor/Phone"/><Link LinkID="9" LinkFrom="5" LinkTo="/FundInvestorsInfo/Investor/DatabasError"/><Link LinkID="10" LinkFrom="/FundInvestorsDatabase/FundCompany" LinkTo="/FundInvestorsInfo/@FundCompany"/></Links><Functoids><Functoid FunctoidID="1" X-Cell="51" Y-Cell="216" Functoid-FID="524" Functoid-Version="1" Script-Functoid="no"><Input-Parameters><Parameter Type="Link" Value="1"/><Parameter Type="Constant" Value="Provider=SQLOLEDB;Data Source=localhost;Initial Catalog=Investors;Integrated Security=SSPI;"/><Parameter Type="Constant" Value="InvestorsInfo"/><Parameter Type="Constant" Value="InvestorID"/></Input-Parameters></Functoid><Functoid FunctoidID="2" X-Cell="54" Y-Cell="214" Functoid-FID="574" Functoid-Version="1" Script-Functoid="no"><Input-Parameters><Parameter Type="Link" Value="2"/><Parameter Type="Constant" Value="InvestorName"/></Input-Parameters></Functoid><Functoid FunctoidID="3" X-Cell="54" Y-Cell="216" Functoid-FID="574" Functoid-Version="1" Script-Functoid="no"><Input-Parameters><Parameter Type="Link" Value="3"/><Parameter Type="Constant" Value="InvestorEmail"/></Input-Parameters></Functoid><Functoid FunctoidID="4" X-Cell="54" Y-Cell="218" Functoid-FID="574" Functoid-Version="1" Script-Functoid="no"><Input-Parameters><Parameter Type="Link" Value="4"/><Parameter Type="Constant" Value="InvestorPhone"/></Input-Parameters></Functoid><Functoid FunctoidID="5" X-Cell="54" Y-Cell="221" Functoid-FID="575" Functoid-Version="1" Script-Functoid="no"><Input-Parameters><Parameter Type="Link" Value="7"/></Input-Parameters></Functoid></Functoids></Page><Page Name="Page 2"><Links/><Functoids/></Page></Pages><CompiledXSL><xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:msxsl="urn:schemas-microsoft-com:xslt" xmlns:var="urn:var" xmlns:userVBScript="urn:userVBScript" xmlns:userJScript="urn:userJScript" exclude-result-prefixes="msxsl var userVBScript userJScript" version="1.0">
+			<xsl:output method="xml" omit-xml-declaration="yes"/>
+			<xsl:template match="/">
+				<xsl:apply-templates select="FundInvestorsDatabase"/>
+			</xsl:template>
+			<xsl:template match="FundInvestorsDatabase">
+				<FundInvestorsInfo>
+					<xsl:if test="FundCompany"><xsl:attribute name="FundCompany"><xsl:value-of select="FundCompany/text()"/></xsl:attribute></xsl:if>
+					<xsl:for-each select="InvestorID">
+						<Investor>
+							<xsl:variable name="var:v1" select="userVBScript:fctdblookup(0,string(./text()),&quot;Provider=SQLOLEDB;Data Source=localhost;Initial Catalog=Investors;Integrated Security=SSPI;&quot;,&quot;InvestorsInfo&quot;,&quot;InvestorID&quot;)"/>
+							<xsl:variable name="var:v2" select="userVBScript:fctdbvalueextract(string($var:v1),&quot;InvestorName&quot;)"/>
+							<InvestorName><xsl:value-of select="$var:v2"/></InvestorName>
+							<xsl:variable name="var:v3" select="userVBScript:fctdbvalueextract(string($var:v1),&quot;InvestorEmail&quot;)"/>
+							<Email><xsl:value-of select="$var:v3"/></Email>
+							<xsl:variable name="var:v4" select="userVBScript:fctdbvalueextract(string($var:v1),&quot;InvestorPhone&quot;)"/>
+							<Phone><xsl:value-of select="$var:v4"/></Phone>
+							<xsl:variable name="var:v5" select="userVBScript:fctdberrorextract(string($var:v1))"/>
+							<DatabasError><xsl:value-of select="$var:v5"/></DatabasError>
+						</Investor>
+					</xsl:for-each>
+				</FundInvestorsInfo>
+				<xsl:variable name="var:v6" select="userVBScript:FctADOShutdown()"/>
+			</xsl:template>
+			<msxsl:script language="VBScript" implements-prefix="userVBScript">
+				<![CDATA[
+Dim ArrConnection()
+
+Dim ArrRecordSet()
+Dim ArrError()
+Dim ArrConnString()
+Dim ArrTableName()
+Dim ArrColName()
+Dim ArrValue()
+
+Dim ArrayLength
+Dim adStateOpen
+Dim adLockReadOnly
+Dim adOpenStatic
+Dim adCmdText
+
+'ado constants
+adStateOpen = 1
+adLockReadOnly = 1
+adOpenStatic = 3
+adCmdText = 1
+
+ArrayLength = 0
+
+Function FctDBLookup(Index, Value, ConnString, Table, Column)
+    On Error Resume Next
+
+    Dim fNewConn
+    fNewConn = False
+
+    If ArrayLength <= Index Then
+        ResizeArrays (Index + 1)
+    End If
+
+    If (ArrConnString(Index) <> ConnString) Or (ArrConnection(Index).State <> adStateOpen) Then
+        fNewConn = True
+
+        If ArrConnection(Index).State = adStateOpen Then
+            ArrConnection(Index).Close
+        End If
+
+        ArrConnString(Index) = ConnString
+        ArrConnection(Index).ConnectionString = ConnString
+        ArrConnection(Index).Open
+
+
+        If ArrConnection(Index).Errors.Count <> 0 Then
+            Dim ErrorItem
+            For Each ErrorItem In ArrConnection(Index).Errors
+                If ErrorItem.Number <> 0 Then
+                    ArrError(Index) = ArrConnection(Index).Errors.Item(0).Description
+                    FctDBLookup = Index
+                    Exit Function
+                End If
+            Next
+        End If
+
+    End If
+
+    If (fNewConn) Or (ArrTableName(Index) <> Table) Or (ArrColName(Index) <> Column) Or _
+       (ArrValue(Index) <> Value) Or (ArrRecordSet(Index).State <> adStateOpen) Then
+
+        If ArrRecordSet(Index).State = adStateOpen Then
+            ArrRecordSet(Index).Close
+        End If
+
+        ArrTableName(Index) = Table
+        ArrColName(Index) = Column
+        ArrValue(Index) = Value
+
+        Dim strQuery
+        strQuery = "SELECT * FROM [" + CStr(Table) + "] WHERE " + CStr(Column) + " = " + "'" + CStr(Value) + "'"
+
+        ArrRecordSet(Index).Open strQuery, ArrConnection(Index), adOpenStatic, adLockReadOnly, adCmdText
+
+        If Err.Number <> 0 Then
+            ArrError(Index) = Err.Description
+        Else
+            ArrError(Index) = ""
+        End If
+
+        Set ArrRecordSet(Index).ActiveConnection = Nothing
+    End If
+
+    FctDBLookup = Index
+
+End Function
+
+Sub ResizeArrays(NumberOfConnections)
+    ArrayLength = NumberOfConnections
+
+    ReDim Preserve ArrConnection(NumberOfConnections)
+    ReDim Preserve ArrRecordSet(NumberOfConnections)
+    ReDim Preserve ArrError(NumberOfConnections)
+    ReDim Preserve ArrConnString(NumberOfConnections)
+    ReDim Preserve ArrTableName(NumberOfConnections)
+    ReDim Preserve ArrColName(NumberOfConnections)
+    ReDim Preserve ArrValue(NumberOfConnections)
+
+    Set ArrConnection(NumberOfConnections - 1) = CreateObject("ADODB.Connection")
+    Set ArrRecordSet(NumberOfConnections - 1) = CreateObject("ADODB.RecordSet")
+End Sub
+
+Function FctADOShutdown()
+    On Error Resume Next
+
+    Dim i
+    For i = 0 To ArrayLength - 1
+        If ArrRecordSet(i).State = adStateOpen Then
+            ArrRecordSet(i).Close
+        End If
+        Set ArrRecordSet(i) = Nothing
+
+        If ArrConnection(i).State = adStateOpen Then
+            ArrConnection(i).Close
+        End If
+        Set ArrConnection(i) = Nothing
+    Next
+
+    FctADOShutdown = 0
+End Function
+
+Function FctDBValueExtract(Index, ColumnName)
+    On Error Resume Next
+
+    FctDBValueExtract = ""
+    If Index < 0 Then
+        FctDBValueExtract = ""
+        Exit Function
+    End If
+
+    If ArrRecordSet(Index).EOF <> True Then
+        FctDBValueExtract = CStr(ArrRecordSet(Index).Fields.Item(ColumnName))
+        If IsNull(FctDBValueExtract) Then
+            FctDBValueExtract = ""
+        End If
+    End If
+End Function
+
+Function FctDBErrorExtract(Index)
+    If Index < 0 Then
+        FctDBErrorExtract = ""
+        Exit Function
+    End If
+    FctDBErrorExtract = ArrError(Index)
+End Function
+
+]]>
+			</msxsl:script>
+		</xsl:stylesheet>
+	</CompiledXSL></mapsource>

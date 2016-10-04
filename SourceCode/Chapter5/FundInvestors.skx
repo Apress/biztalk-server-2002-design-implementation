@@ -1,0 +1,425 @@
+<?xml version="1.0"?>
+<!--
+    File created by XLANG Scheduler Engine version 1.0
+    at Sun Sep 08 18:02:54 2002
+
+    '===========================
+    ' Starting the XLANG schedule
+    Set oSked = GetObject("sked://localhost/C:\Apress\Code\XLANG Schedule\FundInvestors.skx")
+    sName = oSked.FullyQualifiedName
+
+    '===========================
+    ' Getting proxy for COM port
+    ' Set oPort = oSked.Port("yourPortNameBoundToCOM")
+    ' Call oPort.yourMethod(args ...)
+ 
+
+    '===========================
+    ' Get full queue name (MSMQ port)
+    ' or moniker (COM port)
+    ' sName = oSked.FullPortName("yourPortName")
+-->
+<module xmlns="urn:schemas-microsoft-com:scheduler" xmlns:com="urn:schemas-microsoft-com:comscheduler" xmlns:msmq="urn:schemas-microsoft-com:msmqscheduler">
+	<module name="FundInvestors" identity="5F8B4E4C-B7C1-4712-B8ED-851817DB7AB0">
+		<schedule>
+			<header>
+				<portList>
+					<port tag="0!36" name="GetDocument"/>
+					<port tag="0!46" name="CustomerManagement"/>
+					<port tag="0!54" name="EmailInvestors"/>
+					<port tag="0!66" name="NotificationQueue"/>
+					<port tag="0!77" name="SendResponseDocument"/>
+				</portList>
+				<messageList>
+					<message tag="4!3" name="Constants"/>
+					<message tag="4!18" name="FundInvestors"/>
+					<message tag="4!37" name="Investors_in"/>
+					<message tag="4!37" name="Investors_out"/>
+					<message tag="4!72" name="Send_in"/>
+					<message tag="4!72" name="Send_out"/>
+					<message tag="4!99" name="FailedMessage"/>
+					<message tag="4!114" name="ResponseDocument"/>
+				</messageList>
+				<ruleList>
+					<rule tag="0!14" name="Error"/>
+				</ruleList>
+				<contextParameterList/>
+			</header>
+			<sequence tag="0!6">
+				<block>
+					<sink tag="0!5" comment="Receive Document">
+						<portRef location="GetDocument"/>
+						<messageRef location="FundInvestors"/>
+					</sink>
+					<task tag="0!6">
+						<synchronous tag="0!8" comment="Customer Management Process">
+							<source tag="0!8" comment="Customer Management Process">
+								<portRef location="CustomerManagement"/>
+								<messageRef location="Investors_in"/>
+							</source>
+							<sink tag="0!8" comment="Customer Management Process">
+								<portRef location="CustomerManagement"/>
+								<messageRef location="Investors_out"/>
+							</sink>
+						</synchronous>
+						<synchronous tag="0!9" comment="Email notifications to investors">
+							<source tag="0!9" comment="Email notifications to investors">
+								<portRef location="EmailInvestors"/>
+								<messageRef location="Send_in"/>
+							</source>
+							<sink tag="0!9" comment="Email notifications to investors">
+								<portRef location="EmailInvestors"/>
+								<messageRef location="Send_out"/>
+							</sink>
+						</synchronous>
+					</task>
+				</block>
+				<switch tag="0!12">
+					<branch tag="0!14">
+						<case>
+							<ruleRef location="Error"/>
+							<messageRef location="Investors_out"/>
+						</case>
+						<sequence tag="0!15">
+							<block>
+								<source tag="0!15" comment="Notify system administrator">
+									<portRef location="NotificationQueue"/>
+									<messageRef location="FailedMessage"/>
+								</source>
+							</block>
+							<zero tag="0!18"/>
+						</sequence>
+					</branch>
+					<default>
+						<sequence tag="0!16">
+							<block>
+								<source tag="0!16" comment="Send response document back">
+									<portRef location="SendResponseDocument"/>
+									<messageRef location="ResponseDocument"/>
+								</source>
+							</block>
+							<zero tag="0!17"/>
+						</sequence>
+					</default>
+				</switch>
+			</sequence>
+		</schedule>
+		<binding>
+			<moduleRef location="ancestor::*[local-name()='module' and *[local-name()='schedule']]"/>
+			<translationHeaderList>
+				<translationHeader>
+					<com:header txnsupport="DISABLED"/>
+				</translationHeader>
+				<translationHeader>
+					<msmq:header/>
+				</translationHeader>
+			</translationHeaderList>
+			<schemaList>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Constants">
+					<ElementType name="ElementType_Constants">
+						<element type="__Instance_Id__"/>
+					</ElementType>
+					<ElementType name="__Instance_Id__" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_FundInvestors">
+					<ElementType name="ElementType_FundInvestors">
+						<element type="Document"/>
+						<element type="FundCompany"/>
+					</ElementType>
+					<ElementType name="Document" dt:type="string"/>
+					<ElementType name="FundCompany" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Investors_in">
+					<ElementType name="ElementType_Investors_in">
+						<element type="fundcompany"/>
+						<element type="document"/>
+					</ElementType>
+					<ElementType name="fundcompany" dt:type="string"/>
+					<ElementType name="document" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Investors_out">
+					<ElementType name="ElementType_Investors_out">
+						<element type="fundcompany"/>
+						<element type="document"/>
+						<element type="Investors"/>
+					</ElementType>
+					<ElementType name="fundcompany" dt:type="string"/>
+					<ElementType name="document" dt:type="string"/>
+					<ElementType name="Investors" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema___MESSAGE1">
+					<ElementType name="ElementType___MESSAGE1"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Send_in">
+					<ElementType name="ElementType_Send_in">
+						<element type="document"/>
+					</ElementType>
+					<ElementType name="document">
+						<element type="com:variant"/>
+					</ElementType>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_Send_out">
+					<ElementType name="ElementType_Send_out">
+						<element type="document"/>
+						<element type="Send"/>
+					</ElementType>
+					<ElementType name="document">
+						<element type="com:variant"/>
+					</ElementType>
+					<ElementType name="Send">
+						<element type="com:variant"/>
+					</ElementType>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_FailedMessage">
+					<ElementType name="ElementType_FailedMessage">
+						<element type="Document"/>
+					</ElementType>
+					<ElementType name="Document" dt:type="string"/>
+				</Schema>
+				<Schema xmlns="urn:schemas-microsoft-com:xml-data" xmlns:dt="urn:schemas-microsoft-com:datatypes" name="Schema_ResponseDocument">
+					<ElementType name="ElementType_ResponseDocument">
+						<element type="Document"/>
+					</ElementType>
+					<ElementType name="Document" dt:type="string"/>
+				</Schema>
+			</schemaList>
+			<messageDeclList>
+				<messageDecl>
+					<messageRef location="Constants"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Constants']/*[local-name()='ElementType' and @name='ElementType_Constants']"/>
+					<ElementType_Constants xmlns="x-schema:#Schema_Constants" xmlns:sched="urn:schemas-microsoft-com:scheduler">
+						<__Instance_Id__ sched:tag="4!9">__Instance_Id__</__Instance_Id__>
+					</ElementType_Constants>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="FundInvestors"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_FundInvestors']/*[local-name()='ElementType' and @name='ElementType_FundInvestors']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="Investors_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Investors_in']/*[local-name()='ElementType' and @name='ElementType_Investors_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="Investors_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Investors_out']/*[local-name()='ElementType' and @name='ElementType_Investors_out']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="Send_in"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Send_in']/*[local-name()='ElementType' and @name='ElementType_Send_in']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="Send_out"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_Send_out']/*[local-name()='ElementType' and @name='ElementType_Send_out']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="FailedMessage"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_FailedMessage']/*[local-name()='ElementType' and @name='ElementType_FailedMessage']"/>
+				</messageDecl>
+				<messageDecl>
+					<messageRef location="ResponseDocument"/>
+					<messageTypeRef location="ancestor::*[local-name()='binding']/*[local-name()='schemaList']/*[local-name()='Schema' and @name='Schema_ResponseDocument']/*[local-name()='ElementType' and @name='ElementType_ResponseDocument']"/>
+				</messageDecl>
+			</messageDeclList>
+			<portBindingList>
+				<portBinding tag="0!36">
+					<portRef location="GetDocument"/>
+					<portTranslation>
+						<msmq:queue tag="0!31" queueName="bts://&amp;GetDocument&amp;.\private$\GetDocument" wellKnown="0" queueInfoClsid="27f4275d-707c-4047-a77b-56a5d0eb034f" messageClsid="167c7c8e-8300-434c-90f1-d35bb39538fd"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!39">
+							<messageRef location="FundInvestors"/>
+							<messageTranslation>
+								<msmq:message messageType="FundInvestors"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!25">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!25"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!29">
+									<fieldRef location="FundCompany"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!29" xPath="/FundInvestors/FundCompany"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="0!46">
+					<portRef location="CustomerManagement"/>
+					<portTranslation>
+						<com:interface tag="0!42" iid="8b2bb920-6002-44af-b435-b9354c31d8e8" clsid="8f5050db-8191-46ba-a428-8c722e067706" txnsupport="NOT_SUPPORTED"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!49">
+							<messageRef location="Investors_in"/>
+							<messageTranslation>
+								<com:method tag="0!48" name="Investors" slot="7" dispid="1610809344" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!44">
+									<fieldRef location="fundcompany"/>
+									<fieldTranslation>
+										<com:parameter tag="4!44" name="fundcompany" byRef="1"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="FundInvestors"/>
+										<fieldRef location="FundCompany"/>
+									</from>
+								</fieldBinding>
+								<fieldBinding tag="4!48">
+									<fieldRef location="document"/>
+									<fieldTranslation>
+										<com:parameter tag="4!48" name="document" index="1" byRef="1"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="FundInvestors"/>
+										<fieldRef location="Document"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding tag="0!50">
+							<messageRef location="Investors_out"/>
+							<messageTranslation>
+								<com:return tag="0!48" name="Investors" slot="7" dispid="1610809344" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!56">
+									<fieldRef location="fundcompany"/>
+									<fieldTranslation>
+										<com:parameter tag="4!56" name="fundcompany" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!60">
+									<fieldRef location="document"/>
+									<fieldTranslation>
+										<com:parameter tag="4!60" name="document" index="1" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!64">
+									<fieldRef location="Investors"/>
+									<fieldTranslation>
+										<com:parameter tag="4!64" name="Investors" index="2" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="0!54">
+					<portRef location="EmailInvestors"/>
+					<portTranslation>
+						<com:interface tag="0!52" iid="00020400-0000-0000-c000-000000000046" moniker="script:c:\program files\microsoft biztalk server\xlang scheduler\emailinvestors.wsc"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!57">
+							<messageRef location="Send_in"/>
+							<messageTranslation>
+								<com:method tag="0!56" name="Send" dispid="1" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!79">
+									<fieldRef location="document"/>
+									<fieldTranslation>
+										<com:parameter tag="4!79" name="document" byRef="1"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="FundInvestors"/>
+										<fieldRef location="Document"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+						<messageBinding tag="0!58">
+							<messageRef location="Send_out"/>
+							<messageTranslation>
+								<com:return tag="0!56" name="Send" dispid="1" invokeKind="3"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!87">
+									<fieldRef location="document"/>
+									<fieldTranslation>
+										<com:parameter tag="4!87" name="document" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+								<fieldBinding tag="4!91">
+									<fieldRef location="Send"/>
+									<fieldTranslation>
+										<com:parameter tag="4!91" name="Send" index="1" byRef="1"/>
+									</fieldTranslation>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="0!66">
+					<portRef location="NotificationQueue"/>
+					<portTranslation>
+						<msmq:queue tag="0!60" queueName=".\private$\NotificationQueue" transactional="0"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!69">
+							<messageRef location="FailedMessage"/>
+							<messageTranslation>
+								<msmq:message messageType="Messages that Component failed to process"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!106">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!106"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="FundInvestors"/>
+										<fieldRef location="Document"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+				<portBinding tag="0!77">
+					<portRef location="SendResponseDocument"/>
+					<portTranslation>
+						<msmq:queue tag="0!72" queueName="bts://&amp;C_FundInvestors_Outgoing" wellKnown="1" queueInfoClsid="27f4275d-707c-4047-a77b-56a5d0eb034f" messageClsid="167c7c8e-8300-434c-90f1-d35bb39538fd"/>
+					</portTranslation>
+					<messageBindingList>
+						<messageBinding tag="0!80">
+							<messageRef location="ResponseDocument"/>
+							<messageTranslation>
+								<msmq:message messageType="C:\Program Files\Microsoft BizTalk Server\BizTalkServerRepository\DocSpecs\FundInvestors.xml#__Instance_Id__" labelIsInstanceID="1"/>
+							</messageTranslation>
+							<fieldBindingList>
+								<fieldBinding tag="4!121">
+									<fieldRef location="Document"/>
+									<fieldTranslation>
+										<msmq:parameter tag="4!121"/>
+									</fieldTranslation>
+									<from>
+										<messageRef location="Investors_out"/>
+										<fieldRef location="Investors"/>
+									</from>
+								</fieldBinding>
+							</fieldBindingList>
+						</messageBinding>
+					</messageBindingList>
+				</portBinding>
+			</portBindingList>
+			<contextBindingList/>
+			<ruleBindingList>
+				<ruleBinding tag="0!14">
+					<ruleRef location="Error"/>
+					<ruleTranslation>
+						<scriptable tag="0!14" expression="Investors_out.[__Status__] &lt;&gt; 0"/>
+					</ruleTranslation>
+				</ruleBinding>
+			</ruleBindingList>
+			<callBindingList/>
+		</binding>
+	</module>
+</module>
